@@ -17,7 +17,7 @@ export interface IRawReqPacket<T = unknown> {
   method: string;
   service: string;
   headers: {
-    [key: string]: unknown;
+    [key: string]: string;
   };
   payload: T;
 }
@@ -31,7 +31,7 @@ export interface IRawCommandPacket {
 export interface IRawResPacket<T = unknown> {
   opcode: OPCode.Response;
   headers: {
-    [key: string]: unknown;
+    [key: string]: string;
   };
   payload: IResPayloadPacket<T>;
 }

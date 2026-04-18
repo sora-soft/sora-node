@@ -1,6 +1,6 @@
 import {Context} from '../lib/context/Context.js';
 import {type Scope} from '../lib/context/Scope.js';
-import {TraceScope} from '../lib/context/TraceScope.js';
+import {TraceContext} from '../lib/trace/TraceContext.js';
 
 export type JobExecutor<T = unknown> = () => Promise<T>;
 
@@ -43,7 +43,7 @@ class Executor<S extends Scope<unknown> = Scope<unknown>> {
   }
 
   protected runInContext<T>(callback: () => Promise<T>): Promise<T> {
-    if (this.scope_ && !(this.scope_ instanceof TraceScope)) {
+    if (this.scope_ && !(this.scope_ instanceof TraceContext)) {
       return Context.run(this.scope_, callback);
     } else {
       return callback();

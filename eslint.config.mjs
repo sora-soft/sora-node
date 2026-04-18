@@ -37,6 +37,7 @@ export default [
         "before": false, // 禁止分号前有空格
         "after": true    // 强制分号后有空格（如果分号不是行末的话）
       }],
+      "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
       "@typescript-eslint/no-floating-promises": "error",
       "@stylistic/ts/space-before-blocks": ["error", "always"],
       '@stylistic/ts/member-delimiter-style': ['error', {

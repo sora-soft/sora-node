@@ -1,0 +1,47 @@
+{
+  "name": "@sora-soft/ram-discovery",
+  "version": "1.0.2",
+  "description": "sora system ram discovery",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tspc",
+    "clean": "rimraf ./dist",
+    "prepublishOnly": "tspc",
+    "prepare": "ts-patch install -s",
+    "lint": "eslint",
+    "preversion": "eslint && npm run build"
+  },
+  "repository": "git@github.com:sora-soft/ram-discovery.git",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "sora",
+    "ram",
+    "discovery"
+  ],
+  "author": "yaya",
+  "license": "WTFPL",
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin-ts": "^4.4.1",
+    "@types/node": "^24.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "rimraf": "^3.0.2",
+    "ts-patch": "^3.3.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@sora-soft/framework": "workspace:*",
+    "@sora-soft/type-guard": "workspace:*"
+  }
+}

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+
 import type {AnySchema, ValidateFunction} from './Ajv.js';
 import {ajv} from './Const.js';
 import {TypeGuardError} from './TypeGuardError.js';
@@ -10,6 +11,7 @@ interface IParamValidator {
   async: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function AssertType(schema: void) {
   if (!(schema as unknown)) {
     throw new Error('Type guard should use under ttypescript');
@@ -26,8 +28,9 @@ export function AssertType(schema: void) {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export function ValidateClass() {
-  return function (target: {prototype: Record<string, unknown>}) {
+  return function (target: {prototype: any}) {
     for (const propertyKey of Object.getOwnPropertyNames(target.prototype)) {
       const assertions = Reflect.getOwnMetadata(assertionsMetadataKey, target.prototype, propertyKey) as IParamValidator[] || undefined;
       if (assertions) {

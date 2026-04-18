@@ -25,7 +25,7 @@ class Utility {
     return object === undefined;
   }
 
-  static mapToJSON(map: Map<string, unknown>) {
+  static mapToJSON<T = unknown>(map: Map<string, T>) {
     return Object.fromEntries(map);
   }
 
@@ -220,21 +220,21 @@ class StackUtility {
     const my = new Error();
     Error.captureStackTrace(my);
     const stack = ErrorStackParser.parse(my);
-    return stack.slice(1).map(line => `${this.formatFileName(line.getFileName())}:${line.getLineNumber()}`);
+    return stack.slice(1).map(line => `${this.formatFileName(line.getFileName() || 'unknown')}:${line.getLineNumber()}`);
   }
 
   static getStackPosition(depth: number) {
     const my = new Error();
     Error.captureStackTrace(my);
     const line = ErrorStackParser.parse(my)[depth + 1];
-    return this.normalizePath(`${this.normalizePath(line.getFileName())}:${line.getLineNumber()}`);
+    return this.normalizePath(`${this.normalizePath(line.getFileName() || 'unknown')}:${line.getLineNumber()}`);
   }
 
   static getStackFile(depth: number) {
     const my = new Error();
     Error.captureStackTrace(my);
     const line = ErrorStackParser.parse(my)[depth + 1];
-    return this.normalizePath(line.getFileName());
+    return this.normalizePath(line.getFileName() || 'unknown');
   }
 
   static findNearestStack(out: string) {
@@ -242,7 +242,7 @@ class StackUtility {
     Error.captureStackTrace(my);
     const stack = ErrorStackParser.parse(my);
     for (const line of stack.slice(1)) {
-      const fileName = this.normalizePath(line.getFileName());
+      const fileName = this.normalizePath(line.getFileName() || 'unknown');
       if (fileName !== out)
         return line;
     }

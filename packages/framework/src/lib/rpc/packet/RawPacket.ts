@@ -9,20 +9,22 @@ abstract class RawPacket<T> {
     this.payload_ = data.payload as T;
   }
 
-  getHeader<H>(header: string): H | undefined {
-    return this.headers_.get(header) as H | undefined;
+  getHeader(header: string): string | undefined {
+    return this.headers_.get(header) as string | undefined;
   }
 
   loadHeaders(headers: {
-    [key: string]: any;
+    [key: string]: string;
   }) {
     for (const key of Object.keys(headers)) {
       this.headers_.set(key, headers[key]);
     }
   }
 
-  setHeader(header: string, value: any) {
-    this.headers_.set(header, value);
+  setHeader(header: string, value?: string) {
+    if (value) {
+      this.headers_.set(header, value);
+    }
   }
 
   abstract toPacket(): IRawNetPacket<T>;
@@ -44,7 +46,7 @@ abstract class RawPacket<T> {
     return Utility.mapToJSON(this.headers_);
   }
 
-  protected headers_: Map<string, any>;
+  protected headers_: Map<string, string>;
   private opCode_: OPCode;
   private payload_: T;
 }

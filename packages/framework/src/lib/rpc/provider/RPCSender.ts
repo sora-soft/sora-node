@@ -13,10 +13,11 @@ import {Utility} from '../../../utility/Utility.js';
 import {Waiter} from '../../../utility/Waiter.js';
 import {Context} from '../../context/Context.js';
 import {WorkerScope} from '../../context/scope/WorkerScope.js';
-import {RpcClientTraceScope} from '../../context/trace/RpcClientTraceScope.js';
-import {TraceScope} from '../../context/TraceScope.js';
 import {Logger} from '../../logger/Logger.js';
 import {Runtime} from '../../Runtime.js';
+import {RpcClientTraceContext} from '../../trace/context/RpcClientTraceScope.js';
+import {Trace} from '../../trace/Trace.js';
+import {TraceContext} from '../../trace/TraceContext.js';
 import type {Codec} from '../Codec.js';
 import type {Connector} from '../Connector.js';
 import type {ListenerCallback} from '../Listener.js';
@@ -107,14 +108,16 @@ export class RPCSender {
   }
 
   public async callRpc<ResponsePayload>(request: Request, timeout = 10 * 1000): Promise<IRawResPacket<ResponsePayload>> {
-    return Context.run(RpcClientTraceScope.create(), async () => {
+    return Trace.run(RpcClientTraceContext.create(), async () => {
       const wait = this.resWaiter_.wait(timeout);
-      request.setHeader(RPCHeader.RpcIdHeader, wait.id);
+      request.setHeader(RPCHeader.RpcIdHeader, wait.id.toString());
       const workerScope = Context.find(WorkerScope);
       if (workerScope) {
         request.setHeader(RPCHeader.RpcFromIdHeader, workerScope.workerId);
       }
-      const traceScope = Context.find(TraceScope);
+      // 符合 W3C 规范的 trace-context
+      // https://www.w3.org/TR/trace-context/
+      const traceScope = Context.find(TraceContext);
       if (traceScope) {
         request.setHeader(RPCHeader.RPCTraceParent, traceScope.toRPCTraceParentHeader());
         request.setHeader(RPCHeader.RPCTraceState, traceScope.toRPCTraceStateHeader());

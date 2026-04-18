@@ -27,11 +27,11 @@ class Runtime {
   }
 
   private static frameLogger_: FrameworkLogger = new FrameworkLogger();
+  private static rpcLogger_: RPCLogger = new RPCLogger();
 
   static get rpcLogger() {
     return this.rpcLogger_;
   }
-  private static rpcLogger_: RPCLogger = new RPCLogger();
 
   static async loadConfig(options: IRuntimeOptions) {
     this.scope_ = options.scope;

@@ -8,10 +8,9 @@
     "build": "npm run clean && tspc",
     "clean": "rimraf ./dist",
     "prepublishOnly": "tspc",
-    "prepare": "npx husky install && ts-patch install -s",
+    "prepare": "ts-patch install -s",
     "lint": "eslint",
-    "preversion": "eslint && npm run build",
-    "preCommit": "lint-staged"
+    "preversion": "eslint && npm run build"
   },
   "repository": "git@github.com:sora-soft/framework.git",
   "type": "module",
@@ -31,11 +30,6 @@
   ],
   "author": "yaya",
   "license": "WTFPL",
-  "lint-staged": {
-    "*.ts": [
-      "eslint"
-    ]
-  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/eslint-plugin-ts": "^4.4.1",
@@ -46,8 +40,6 @@
     "eslint": "^9.39.4",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.2",
     "rimraf": "^3.0.2",
     "ts-patch": "^3.3.0",
     "typescript": "^6.0.2"

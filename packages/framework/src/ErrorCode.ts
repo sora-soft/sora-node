@@ -15,6 +15,7 @@ export enum FrameworkErrorCode {
   ErrProviderConnectStrategy = 'ERR_PROVIDER_CONNECT_STRATEGY',
   ErrTraceScopeNotFound = 'Err_TRACE_SCOPE_NOT_FOUND',
   ErrWorkerScopeNotFound = 'ERR_WORKER_SCOPE_NOT_FOUND',
+  ErrComponentNotConnected = 'ERR_COMPONENT_NOT_CONNECTED',
 }
 
 export enum RPCErrorCode {

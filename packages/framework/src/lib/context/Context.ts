@@ -22,7 +22,7 @@ export class Context {
           get(obj: IScopeClass, prop: string | symbol, receiver: any) {
             const value = Reflect.get(obj, prop, receiver);
 
-            if (typeof value === 'function') {
+            if (typeof value === 'function' && !Object.prototype.hasOwnProperty.call(obj, prop)) {
               return (...funcArgs: any[]) => {
                 const classScope = obj.scope;
                 if (classScope) {
@@ -63,9 +63,15 @@ export class Context {
     return this.storage_.getStore() as Scope<T> || this.root;
   }
 
-  static wrap<T extends Scope<unknown>, Args extends any[], R>(scope: T, func: (...args: Args) => R): (...args: Args) => R {
+  static bind<T extends Scope<unknown>, Args extends any[], R>(scope: T, func: (...args: Args) => R): (...args: Args) => R {
     return (...args: Args): R => {
       return this.storage_.run(scope, func, ...args);
+    };
+  }
+
+  static wrap<Args extends any[], R>(func: (...args: Args) => R): (...args: Args) => R {
+    return (...args: Args): R => {
+      return this.storage_.run(this.current(), func, ...args);
     };
   }
 

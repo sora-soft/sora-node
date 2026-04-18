@@ -132,9 +132,9 @@ class Route {
             payload: {error: null, result: null},
           });
           try {
-            const rpcId = request.getHeader<number>(RPCHeader.RpcIdHeader);
+            const rpcId = request.getHeader(RPCHeader.RpcIdHeader);
             request.setHeader(RPCHeader.RpcSessionHeader, session);
-            Runtime.rpcLogger.debug('route', {event: 'receive-rpc-request', method: request.method});
+            Runtime.rpcLogger.category.debug({event: 'receive-rpc-request', method: request.method});
 
             response.setHeader(RPCHeader.RpcIdHeader, rpcId);
 
@@ -142,11 +142,11 @@ class Route {
               throw new RouteError(RPCErrorCode.ErrRpcMethodNotFound, 'method not found', ErrorLevel.Expected, {method: request.method});
 
             await route.callMethod(request.method, request, response, connector);
-            Runtime.rpcLogger.debug('route', {event: 'response-rpc-request', method: request.method});
+            Runtime.rpcLogger.category.debug({event: 'response-rpc-request', method: request.method});
 
             return response.toPacket();
           } catch (err) {
-            Runtime.rpcLogger.error('route', err as Error, {event: 'rpc-handler-error', error: Logger.errorMessage(err as Error), method: request.method, request: request.payload});
+            Runtime.rpcLogger.category.error(err as Error, {event: 'rpc-handler-error', error: Logger.errorMessage(err as Error), method: request.method, request: request.payload});
             const exError = ExError.fromError(err as Error);
             return this.makeErrorRPCResponse(request, response, exError);
           }
@@ -156,14 +156,14 @@ class Route {
           // notify 不需要回复
           const notify = new Notify(packet);
           notify.setHeader(RPCHeader.RpcSessionHeader, session);
-          Runtime.rpcLogger.debug('route', {event: 'receive-notify', method: notify.method});
+          Runtime.rpcLogger.category.debug({event: 'receive-notify', method: notify.method});
           if (!route.hasNotify(notify.method))
             throw new RouteError(RPCErrorCode.ErrRpcMethodNotFound, 'notify not found', ErrorLevel.Expected, {method: notify.method});
 
           await route.callNotify(notify.method, notify, connector).catch((err: ExError) => {
-            Runtime.frameLogger.error('route', err, {event: 'notify-handler', error: Logger.errorMessage(err), method: notify.method, request: notify.payload});
+            Runtime.frameLogger.category.error(err, {event: 'notify-handler', error: Logger.errorMessage(err), method: notify.method, request: notify.payload});
           });
-          Runtime.rpcLogger.debug('route', {event: 'handled-notify', method: notify.method});
+          Runtime.rpcLogger.category.debug({event: 'handled-notify', method: notify.method});
           return null;
         }
         default: {

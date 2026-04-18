@@ -3,14 +3,17 @@ import {TimeoutError} from './TimeoutError.js';
 class Waiter<T> {
   constructor() {
     this.pool_ = new Map();
-    this.id_ = 0;
+    this.id_ = 1;
   }
 
   wait(ttlMs?: number) {
     if (this.id_ >= Number.MAX_SAFE_INTEGER) {
-      this.id_ = 0;
+      this.id_ = 1;
     }
-    const id = ++this.id_;
+    while(this.pool_.get(this.id_)) {
+      this.id_++;
+    }
+    const id = this.id_;
     let timer: NodeJS.Timeout;
     if (ttlMs) {
       timer = setTimeout(() => {
@@ -18,6 +21,7 @@ class Waiter<T> {
           const info = this.pool_.get(id);
           if (!info)
             return;
+          this.pool_.delete(id);
           info.reject(new TimeoutError());
         }
       }, ttlMs);

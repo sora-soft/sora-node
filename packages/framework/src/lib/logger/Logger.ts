@@ -86,7 +86,7 @@ class Logger {
   static errorMessage(e: ExError | Error) {
     const err = ExError.fromError(e);
     try {
-      const stack = ErrorStackParser.parse(e).map(line => `${this.normalizePath(line.getFileName())}:${line.getLineNumber()}`);
+      const stack = ErrorStackParser.parse(e).map(line => `${this.normalizePath(line.getFileName() || 'unknown')}:${line.getLineNumber()}`);
       return {code: err.code, name: err.name, message: err.message, stack, args: err.args};
     } catch (_) {
       return e;

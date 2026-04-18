@@ -1,0 +1,62 @@
+{
+  "name": "@sora-soft/http-support",
+  "version": "1.6.6",
+  "description": "sora system http support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tspc",
+    "clean": "rimraf ./dist",
+    "prepublishOnly": "tspc",
+    "prepare": "ts-patch install -s",
+    "lint": "eslint",
+    "preversion": "eslint && npm run build"
+  },
+  "repository": "git@github.com:sora-soft/http-support.git",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./koa": {
+      "import": "./dist/koa.js",
+      "types": "./dist/koa.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "sora",
+    "http"
+  ],
+  "author": "yaya",
+  "license": "WTFPL",
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin-ts": "^4.4.1",
+    "@types/cookie": "^1.0.0",
+    "@types/koa": "^2.15.0",
+    "@types/node": "^24.0.0",
+    "@types/uuid": "^8.3.0",
+    "@types/ws": "^8.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "rimraf": "^3.0.2",
+    "ts-patch": "^3.3.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@sora-soft/framework": "workspace:*",
+    "@sora-soft/type-guard": "workspace:*",
+    "axios": "^1.15.0",
+    "cookie": "^1.1.1",
+    "fast-xml-parser": "^4.4.0",
+    "koa": "^2.13.1",
+    "qs": "^6.15.1",
+    "raw-body": "^3.0.2",
+    "uuid": "^8.3.2",
+    "ws": "^8.4.2"
+  }
+}

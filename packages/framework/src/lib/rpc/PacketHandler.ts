@@ -9,9 +9,10 @@ import {Utility} from '../../utility/Utility.js';
 import type {Waiter} from '../../utility/Waiter.js';
 import {Context} from '../context/Context.js';
 import {WorkerScope} from '../context/scope/WorkerScope.js';
-import {RpcServerTraceScope} from '../context/trace/RpcServerTraceScope.js';
 import {Logger} from '../logger/Logger.js';
 import {Runtime} from '../Runtime.js';
+import {RpcServerTraceContext} from '../trace/context/RpcServerTraceContext.js';
+import {Trace} from '../trace/Trace.js';
 import type {Connector} from './Connector.js';
 import type {ListenerCallback} from './Listener.js';
 import {RouteError} from './RouteError.js';
@@ -25,14 +26,14 @@ export class PacketHandler {
         const traceParent = data.headers[RPCHeader.RPCTraceParent] as string | undefined;
         const traceState = data.headers[RPCHeader.RPCTraceState] as string | undefined;
 
-        const scope = RpcServerTraceScope.create(traceParent, traceState);
-        await Context.run(scope, async () => {
+        const context = RpcServerTraceContext.create(traceParent, traceState);
+        await Trace.run(context, async () => {
           if (!callback) {
             Runtime.frameLogger.warn('connector', {event: 'connector-response-not-enabled', session: connector.session});
             return;
           }
 
-          const rpcId = data.headers[RPCHeader.RpcIdHeader] as number | undefined;
+          const rpcId = data.headers[RPCHeader.RpcIdHeader] as string | undefined;
           const headers: Record<string, any> = {
             [RPCHeader.RpcIdHeader]: rpcId,
           };
@@ -94,9 +95,9 @@ export class PacketHandler {
         const traceParent = data.headers[RPCHeader.RPCTraceParent] as string | undefined;
         const traceState = data.headers[RPCHeader.RPCTraceState] as string | undefined;
 
-        const scope = RpcServerTraceScope.create(traceParent, traceState);
+        const scope = RpcServerTraceContext.create(traceParent, traceState);
 
-        await Context.run(scope, async () => {
+        await Trace.run(scope, async () => {
           if (!callback) {
             Runtime.frameLogger.warn('connector', {event: 'connector-response-not-enabled', session: connector.session});
             return;
