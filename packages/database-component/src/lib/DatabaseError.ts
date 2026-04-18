@@ -1,9 +1,9 @@
-import {ExError} from '@sora-soft/framework';
-import {DatabaseErrorCode} from './DatabaseErrorCode.js';
+import {ErrorLevel, ExError} from '@sora-soft/framework';
+
 
 class DatabaseError extends ExError {
-  constructor(code: DatabaseErrorCode, message: string) {
-    super(code, 'DatabaseError', message);
+  constructor(code: string, message: string) {
+    super(code, 'DatabaseError', message, ErrorLevel.Unexpected, {});
     Object.setPrototypeOf(this, DatabaseError.prototype);
     Error.captureStackTrace(this, this.constructor);
   }

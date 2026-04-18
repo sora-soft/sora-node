@@ -215,7 +215,9 @@ class HTTPConnector extends Connector {
     const packet: IRawNetPacket = {
       opcode: OPCode.Request,
       headers: {
-        ...req.headers,
+        ...Object.fromEntries(
+          Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? JSON.stringify(v) : v as string]),
+        ),
         [RPCHeader.RpcIdHeader]: '1',
         [HTTPHeader.HttpMethodHeader]: ctx.method.toLocaleLowerCase(),
       },

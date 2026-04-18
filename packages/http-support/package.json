@@ -44,8 +44,7 @@
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
     "rimraf": "^3.0.2",
-    "ts-patch": "^3.3.0",
-    "typescript": "^6.0.2"
+    "ts-patch": "^3.3.0"
   },
   "dependencies": {
     "@sora-soft/framework": "workspace:*",

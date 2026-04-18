@@ -1,7 +1,7 @@
 class SQLUtility {
   static prepareQuery(sql: string, params: unknown[]) {
     let finalSQL = sql;
-    const parameters: {[k: number]: unknown} = {};
+    const parameters: {[k: string]: unknown} = {};
 
     const m = sql.match(/\?/g);
     if (m === null) {

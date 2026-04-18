@@ -1,18 +1,31 @@
-import {And, Any, Between, Equal, FindOptionsWhere, ILike, In, IsNull, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not, Raw} from 'typeorm';
+import {And, Any, Between, Equal, type FindOptionsWhere, ILike, In, IsNull, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not, Raw} from 'typeorm';
 
 export enum WhereOperators {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   any = '$any',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   between = '$between',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   eq = '$eq',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   iLike = '$iLike',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   in = '$in',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   isNull = '$isNull',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   lt = '$lt',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   lte = '$lte',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   like = '$like',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   gt = '$gt',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   gte = '$gte',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   not = '$not',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   raw = '$raw',
 }
 
@@ -76,14 +89,14 @@ class WhereBuilder {
     }
 
     if (value instanceof Object) {
-      const result = {};
+      const result: Record<string, any> = {};
       Object.entries(value).forEach(([key, v]) => {
         const keys = Object.keys(v as Object);
         if (keys.length > 0 && keys.every(k => k.startsWith('$'))) {
           if (keys.length === 1) {
-            result[key] = this.buildOperator(keys[0] as WhereOperators, (v as Object)[keys[0]]);
+            result[key] = this.buildOperator(keys[0] as WhereOperators, (v as any)[keys[0]]);
           } else {
-            result[key] = And(...keys.map(k => this.buildOperator(k as WhereOperators, (v as Object)[k])));
+            result[key] = And(...keys.map(k => this.buildOperator(k as WhereOperators, (v as any)[k])));
           }
         } else {
           result[key] = this.build(v as Object);
@@ -116,7 +129,7 @@ class WhereBuilder {
     const parameters: any[] = [];
     if (value instanceof Object) {
       Object.entries(value).map(([k, val]) => {
-        const v = val as Object;
+        const v: Record<string, any> = val as Record<string, any>;
         const keys = Object.keys(v);
 
         if (keys.length === 1 && keys[0].startsWith('$')) {

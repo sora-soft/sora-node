@@ -1,15 +1,11 @@
-import {Component, IComponentOptions} from '@sora-soft/framework';
-import {ValidateClass, AssertType} from '@sora-soft/type-guard';
-import {readFile} from 'fs/promises';
-import {EntityTarget, DataSource, ObjectLiteral, ObjectType, DataSourceOptions} from 'typeorm';
+import {Component, FrameworkErrorCode, type IComponentOptions} from '@sora-soft/framework';
+import {AssertType, ValidateClass} from '@sora-soft/type-guard';
+import {DataSource, type DataSourceOptions, type EntityTarget, type ObjectLiteral, type ObjectType} from 'typeorm';
+
 import {DatabaseError} from './DatabaseError.js';
 import {DatabaseErrorCode} from './DatabaseErrorCode.js';
 import {SQLUtility} from './SQLUtility.js';
-import {WhereBuilder, WhereCondition} from './WhereBuilder.js';
-
-const pkg = JSON.parse(
-  await readFile(new URL('../../package.json', import.meta.url), {encoding: 'utf-8'})
-) as {version: string};
+import {WhereBuilder, type WhereCondition} from './WhereBuilder.js';
 
 export interface IDatabaseComponentOptions extends IComponentOptions {
   database: DataSourceOptions;
@@ -50,6 +46,9 @@ class DatabaseComponent extends Component {
   protected async connect() {
     if (this.connected_) return;
 
+    if (!this.databaseOptions_)
+      throw new DatabaseError(FrameworkErrorCode.ErrComponentNotConnected, 'data source options is undefined');
+
     this.dataSource_ = new DataSource({
       name: this.name_,
       synchronize: false,
@@ -66,13 +65,13 @@ class DatabaseComponent extends Component {
     if (!this.dataSource_)
       return;
     await this.dataSource_.destroy();
-    this.dataSource_ = null;
+    this.dataSource_ = undefined;
     this.connected_ = false;
   }
 
   buildSQL<T extends ObjectLiteral>(
     entity: EntityTarget<T>,
-    options: ISqlOptions<T>
+    options: ISqlOptions<T>,
   ) {
     let sqlBuilder = this.manager
       .getRepository(entity)
@@ -132,20 +131,20 @@ class DatabaseComponent extends Component {
 
   get dataSource() {
     if (!this.dataSource_)
-      throw new DatabaseError(DatabaseErrorCode.ERR_COMPONENT_NOT_CONNECTED, `ERR_COMPONENT_NOT_CONNECTED, name=${this.name_}`);
+      throw new DatabaseError(FrameworkErrorCode.ErrComponentNotConnected, 'data source is undefined');
 
     if (!this.dataSource_.isInitialized)
-      throw new DatabaseError(DatabaseErrorCode.ERR_COMPONENT_NOT_INITIALIZED, `ERR_COMPONENT_NOT_INITIALIZED, name=${this.name_}`);
+      throw new DatabaseError(DatabaseErrorCode.ErrComponentNotInitialized, 'data source isInitialized is false');
 
     return this.dataSource_;
   }
 
   get manager() {
     if (!this.dataSource_)
-      throw new DatabaseError(DatabaseErrorCode.ERR_COMPONENT_NOT_CONNECTED, `ERR_COMPONENT_NOT_CONNECTED, name=${this.name_}`);
+      throw new DatabaseError(FrameworkErrorCode.ErrComponentNotConnected, 'data source is undefined');
 
     if (!this.dataSource_.isInitialized)
-      throw new DatabaseError(DatabaseErrorCode.ERR_COMPONENT_NOT_INITIALIZED, `ERR_COMPONENT_NOT_INITIALIZED, name=${this.name_}`);
+      throw new DatabaseError(DatabaseErrorCode.ErrComponentNotInitialized, 'data source isInitialized is false');
 
     return this.dataSource_.manager;
   }
@@ -155,17 +154,20 @@ class DatabaseComponent extends Component {
   }
 
   get version() {
-    return pkg.version ;
+    return __VERSION__;
   }
 
   get dataSourceOptions() {
+    if (!this.databaseOptions_)
+      throw new DatabaseError(FrameworkErrorCode.ErrComponentNotConnected, 'data source options is undefined');
     return this.databaseOptions_.database;
   }
 
-  private databaseOptions_: IDatabaseComponentOptions;
+  private databaseOptions_?: IDatabaseComponentOptions;
   private entities_: ObjectType<unknown>[];
   private connected_: boolean;
-  private dataSource_: DataSource | null;
+  private dataSource_?: DataSource;
 }
 
 export {DatabaseComponent};
+
