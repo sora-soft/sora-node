@@ -1,0 +1,75 @@
+{
+  "name": "example-project",
+  "version": "1.0.0",
+  "description": "sora system example",
+  "bin": {
+    "app-server": "./bin/cli.js"
+  },
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rimraf ./dist && tspc",
+    "dev": "npm run build && node ./bin/cli.js run server --config ./config.yml -w ./run",
+    "start": "node ./bin/cli.js run server --config ./config.yml -w ./run",
+    "migrate:sync": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n database-migrate-command sync",
+    "migrate": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n database-migrate-command migrate",
+    "migrate:drop": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n database-migrate-command drop",
+    "migrate:revert": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n database-migrate-command revert",
+    "migrate:generate": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n database-migrate-command generate",
+    "config": "sora config -t ./run/config.template.yml -d ./run/config.yml && sora config -t ./run/config-command.template.yml -d ./run/config-command.yml",
+    "auth": "node ./bin/cli.js command --config ./config-command.yml -w ./run -n auth-command",
+    "lint": "eslint src/",
+    "prepare": "ts-patch install -s"
+  },
+  "repository": "git@github.com:sora-soft/example-project.git",
+  "keywords": [
+    "sora"
+  ],
+  "author": "yaya",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/sora-soft/example-project/issues"
+  },
+  "homepage": "https://github.com/sora-soft/example-project#readme",
+  "dependencies": {
+    "@alicloud/pop-core": "^1.7.10",
+    "@sora-soft/database-component": "workspace:*",
+    "@sora-soft/etcd-component": "workspace:*",
+    "@sora-soft/etcd-discovery": "workspace:*",
+    "@sora-soft/framework": "workspace:*",
+    "@sora-soft/http-support": "workspace:*",
+    "@sora-soft/redis-component": "workspace:*",
+    "@sora-soft/type-guard": "^1.1.1",
+    "axios": "^1.4.0",
+    "camelcase": "^6.2.0",
+    "class-validator": "^0.13.1",
+    "commander": "^7.2.0",
+    "js-yaml": "^4.0.0",
+    "md5": "^2.3.0",
+    "mkdirp": "^2.1.5",
+    "moment": "^2.29.1",
+    "mysql2": "^2.2.5",
+    "reflect-metadata": "^0.2.2",
+    "source-map-support": "^0.5.19",
+    "typia": "^12.0.2"
+  },
+  "devDependencies": {
+    "@sora-soft/cli": "^1.4.1",
+    "@sora-soft/typia-decorator": "workspace:*",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin-ts": "^4.4.1",
+    "@types/js-yaml": "^4.0.0",
+    "@types/md5": "^2.3.0",
+    "@types/node": "^24.0.0",
+    "@types/source-map-support": "^0.5.3",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "globals": "^17.5.0",
+    "rimraf": "^3.0.2",
+    "ts-patch": "^3.3.0",
+    "typescript": "^5.9.3"
+  }
+}
