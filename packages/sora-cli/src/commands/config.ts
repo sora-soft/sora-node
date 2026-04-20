@@ -1,19 +1,19 @@
-import {flags} from '@oclif/command';
+import {flags as oclifFlags} from '@oclif/command';
 import template = require('art-template');
 import path = require('path');
 import fs = require('fs/promises');
 import inquirer = require('inquirer');
 import os = require('os');
 
-import {BaseCommand} from '../base';
+import {BaseCommand} from '../Base';
 
 export default class ConfigCommand extends BaseCommand {
   static description = 'Generate configuration file from template';
 
   static flags = {
     ...BaseCommand.flags,
-    template: flags.string({char: 't', description: 'Template config file', required: true}),
-    dist: flags.string({char: 'd', description: 'Output file', required: true}),
+    template: oclifFlags.string({char: 't', description: 'Template config file', required: true}),
+    dist: oclifFlags.string({char: 'd', description: 'Output file', required: true}),
   };
 
   async run() {
@@ -108,7 +108,7 @@ async function generateConfigFile(options: IGenerateConfigFile) {
   try {
     const preFile = await fs.readFile(preVarFilePath, {encoding: 'utf-8'});
     preVar = JSON.parse(preFile);
-  } catch(err) {}
+  } catch(_) {}
 
   const templateContent = await fs.readFile(options.template, {encoding: 'utf-8'});
   const vars: {key: string; type: string; hint: string}[] = [];
@@ -122,7 +122,7 @@ async function generateConfigFile(options: IGenerateConfigFile) {
     },
   }, {
     test: /\#define\(([\w\W]*?)\)(\S*?)[\r\n]/,
-    use(match: string, code: string) {
+    use(match: string, _: string) {
       const [key, type, ...hint] = match.slice(8, match.lastIndexOf(')')).split(',');
       vars.push({key: key.trim(), type: type.trim(), hint: hint.join(',').trim()});
       return {

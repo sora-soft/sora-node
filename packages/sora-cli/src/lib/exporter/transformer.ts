@@ -1,8 +1,8 @@
 import * as ts from 'typescript';
 
-import {AnnotationReader} from './annotation-reader';
-import {transferJSDoc} from './jsdoc-utils';
-import {type ExportClassInfo, type ExportSimpleInfo} from './types';
+import {AnnotationReader} from './AnnotationReader';
+import {transferJSDoc} from './JSDocUtils';
+import {type ExportClassInfo, type ExportSimpleInfo} from './Types';
 
 interface TransformedDeclaration {
   name: string;
@@ -11,7 +11,7 @@ interface TransformedDeclaration {
   originalNode?: ts.Node;
 }
 
-const FRAMEWORK_MODULE = '@sora-soft/framework';
+const frameworkModule = '@sora-soft/framework';
 
 function getNodeDecorators(node: ts.Node): ts.Decorator[] {
   if (ts.canHaveDecorators(node)) {
@@ -39,7 +39,7 @@ class Transformer {
     routes: ExportClassInfo[],
     entities: ExportClassInfo[],
     simple: ExportSimpleInfo[],
-    targets?: string[],
+    targets?: string[]
   ): TransformedDeclaration[] {
     const results: TransformedDeclaration[] = [];
     const checker = program.getTypeChecker();
@@ -133,13 +133,13 @@ class Transformer {
       decl.members.map(member => {
         ts.setTextRange(member, {pos: -1, end: -1});
         return transferJSDoc(member, member, sourceFile) as ts.EnumMember;
-      }),
+      })
     );
 
     const result = ts.factory.createEnumDeclaration(
       modifiers,
       ts.factory.createIdentifier(decl.name.text),
-      members,
+      members
     );
 
     return transferJSDoc(decl, result, sourceFile) as ts.EnumDeclaration;
@@ -152,7 +152,7 @@ class Transformer {
       decl.members.map(member => {
         ts.setTextRange(member, {pos: -1, end: -1});
         return transferJSDoc(member, member, sourceFile) as ts.TypeElement;
-      }),
+      })
     );
 
     const result = ts.factory.createInterfaceDeclaration(
@@ -160,7 +160,7 @@ class Transformer {
       ts.factory.createIdentifier(decl.name.text),
       decl.typeParameters,
       decl.heritageClauses,
-      members,
+      members
     );
 
     return transferJSDoc(decl, result, sourceFile) as ts.InterfaceDeclaration;
@@ -172,7 +172,7 @@ class Transformer {
       modifiers,
       ts.factory.createIdentifier(decl.name.text),
       decl.typeParameters,
-      decl.type,
+      decl.type
     );
     return transferJSDoc(decl, result, sourceFile) as ts.TypeAliasDeclaration;
   }
@@ -182,7 +182,7 @@ class Transformer {
     sourceFile: ts.SourceFile,
     routeInfo: ExportClassInfo,
     targets: string[] | undefined,
-    checker: ts.TypeChecker,
+    checker: ts.TypeChecker
   ): ts.InterfaceDeclaration {
     const members: ts.TypeElement[] = [];
     const routeMethodImportMap = this.buildRouteMethodImportMap(sourceFile);
@@ -205,7 +205,7 @@ class Transformer {
           const returnTypeNode = checker.typeToTypeNode(
             signature.getReturnType(),
             undefined,
-            ts.NodeBuilderFlags.NoTruncation,
+            ts.NodeBuilderFlags.NoTruncation
           );
           if (returnTypeNode) {
             returnType = returnTypeNode;
@@ -219,7 +219,7 @@ class Transformer {
         member.questionToken,
         member.typeParameters,
         this.updateParameters(params, sourceFile),
-        returnType,
+        returnType
       );
 
       members.push(transferJSDoc(member, newMethod, sourceFile) as ts.TypeElement);
@@ -230,7 +230,7 @@ class Transformer {
       classDecl.name!,
       classDecl.typeParameters,
       undefined,
-      members,
+      members
     );
 
     return transferJSDoc(classDecl, iface, sourceFile) as ts.InterfaceDeclaration;
@@ -240,7 +240,7 @@ class Transformer {
     classDecl: ts.ClassDeclaration,
     sourceFile: ts.SourceFile,
     entityInfo: ExportClassInfo,
-    targets?: string[],
+    targets?: string[]
   ): ts.InterfaceDeclaration {
     const members: ts.TypeElement[] = [];
 
@@ -261,14 +261,14 @@ class Transformer {
         undefined,
         member.name,
         member.questionToken,
-        member.type,
+        member.type
       );
 
       members.push(transferJSDoc(member, newProp, sourceFile) as ts.TypeElement);
     }
 
     const extendsClauses = classDecl.heritageClauses?.filter(
-      clause => clause.token === ts.SyntaxKind.ExtendsKeyword,
+      clause => clause.token === ts.SyntaxKind.ExtendsKeyword
     );
     const heritageClauses = extendsClauses?.length ? extendsClauses : undefined;
 
@@ -277,7 +277,7 @@ class Transformer {
       classDecl.name!,
       classDecl.typeParameters,
       heritageClauses,
-      members,
+      members
     );
 
     return transferJSDoc(classDecl, iface, sourceFile) as ts.InterfaceDeclaration;
@@ -286,7 +286,7 @@ class Transformer {
   private transformGenericClass(
     classDecl: ts.ClassDeclaration,
     sourceFile: ts.SourceFile,
-    targets?: string[],
+    targets?: string[]
   ): ts.InterfaceDeclaration {
     const members: ts.TypeElement[] = [];
 
@@ -309,14 +309,14 @@ class Transformer {
           undefined,
           member.name!,
           member.questionToken,
-          member.type,
+          member.type
         );
         members.push(transferJSDoc(member, newProp, sourceFile) as ts.TypeElement);
       }
     }
 
     const extendsClauses = classDecl.heritageClauses?.filter(
-      clause => clause.token === ts.SyntaxKind.ExtendsKeyword,
+      clause => clause.token === ts.SyntaxKind.ExtendsKeyword
     );
     const heritageClauses = extendsClauses?.length ? extendsClauses : undefined;
 
@@ -325,7 +325,7 @@ class Transformer {
       classDecl.name!,
       classDecl.typeParameters,
       heritageClauses,
-      members,
+      members
     );
 
     return transferJSDoc(classDecl, iface, sourceFile) as ts.InterfaceDeclaration;
@@ -376,7 +376,7 @@ class Transformer {
       if (!ts.isImportDeclaration(statement)) continue;
 
       const moduleSpecifier = (statement.moduleSpecifier as ts.StringLiteral).text;
-      const isFramework = moduleSpecifier === FRAMEWORK_MODULE ||
+      const isFramework = moduleSpecifier === frameworkModule ||
         moduleSpecifier.startsWith('@sora-soft/framework/');
 
       if (!isFramework) continue;
@@ -454,7 +454,7 @@ class Transformer {
     return result;
   }
 
-  private updateParameters(params: readonly ts.ParameterDeclaration[], _sourceFile: ts.SourceFile): ts.NodeArray<ts.ParameterDeclaration> {
+  private updateParameters(params: readonly ts.ParameterDeclaration[], _: ts.SourceFile): ts.NodeArray<ts.ParameterDeclaration> {
     const newParams = params.map(p => {
       return ts.factory.updateParameterDeclaration(
         p,
@@ -463,7 +463,7 @@ class Transformer {
         p.name,
         p.questionToken,
         p.type,
-        undefined,
+        undefined
       );
     });
     return ts.factory.createNodeArray(newParams);

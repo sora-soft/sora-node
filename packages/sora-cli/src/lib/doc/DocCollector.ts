@@ -1,8 +1,8 @@
 import * as ts from 'typescript';
 
-import {AnnotationReader} from '../exporter/annotation-reader';
-import {Collector} from '../exporter/collector';
-import {type ExportClassInfo, type ExportPlan} from '../exporter/types';
+import {AnnotationReader} from '../exporter/AnnotationReader';
+import {Collector} from '../exporter/Collector';
+import {type ExportPlan} from '../exporter/Types';
 
 export interface DocExportPlan {
   routes: DocRouteInfo[];

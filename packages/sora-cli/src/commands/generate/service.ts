@@ -1,21 +1,21 @@
-import {flags} from '@oclif/command';
+import {flags as oclifFlags} from '@oclif/command';
 import inquirer = require('inquirer');
 import template = require('art-template');
 import path = require('path');
 
-import {BaseCommand} from '../../base';
-import {CodeInserter} from '../../lib/ast/code-inserter';
+import {BaseCommand} from '../../Base';
+import {CodeInserter} from '../../lib/ast/CodeInserter';
 import {type ScriptFileNode} from '../../lib/fs/ScriptFileNode';
 import {Utility} from '../../lib/Utility';
 
-const VALID_LISTENERS = ['tcp', 'websocket', 'http', 'none'];
+const validListeners = ['tcp', 'websocket', 'http', 'none'];
 
 function parseListeners(raw: string | undefined): string[] {
   if (!raw) return [];
   const items = raw.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
   for (const item of items) {
-    if (!VALID_LISTENERS.includes(item)) {
-      throw new Error(`Invalid listener type: "${item}". Valid types: ${VALID_LISTENERS.join(', ')}`);
+    if (!validListeners.includes(item)) {
+      throw new Error(`Invalid listener type: "${item}". Valid types: ${validListeners.join(', ')}`);
     }
   }
   const hasNone = items.includes('none');
@@ -36,9 +36,9 @@ export default class GenerateService extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    listeners: flags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
-    standalone: flags.boolean({description: 'Generate as SingletonService'}),
-    'dry-run': flags.boolean({description: 'Show what would be generated without writing'}),
+    listeners: oclifFlags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
+    standalone: oclifFlags.boolean({description: 'Generate as SingletonService'}),
+    'dry-run': oclifFlags.boolean({description: 'Show what would be generated without writing'}),
   };
 
   async run() {

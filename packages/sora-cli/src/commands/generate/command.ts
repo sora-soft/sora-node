@@ -1,10 +1,10 @@
-import {flags} from '@oclif/command';
+import {flags as oclifFlags} from '@oclif/command';
 import inquirer = require('inquirer');
 import template = require('art-template');
 import path = require('path');
 
-import {BaseCommand} from '../../base';
-import {CodeInserter} from '../../lib/ast/code-inserter';
+import {BaseCommand} from '../../Base';
+import {CodeInserter} from '../../lib/ast/CodeInserter';
 import {type ScriptFileNode} from '../../lib/fs/ScriptFileNode';
 import {Utility} from '../../lib/Utility';
 
@@ -17,7 +17,7 @@ export default class GenerateCommand extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    'dry-run': flags.boolean({description: 'Show what would be generated without writing'}),
+    'dry-run': oclifFlags.boolean({description: 'Show what would be generated without writing'}),
   };
 
   async run() {

@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 
-const SORA_TAGS = new Set(['soraExport', 'soraTargets', 'soraIgnore', 'soraPrefix', 'method']);
+const soraTags = new Set(['soraExport', 'soraTargets', 'soraIgnore', 'soraPrefix', 'method']);
 
 export function stripSoraTagsFromComment(commentText: string): string {
   const lines = commentText.split('\n');
@@ -11,7 +11,7 @@ export function stripSoraTagsFromComment(commentText: string): string {
     } else if (trimmed === '*') {
       trimmed = '';
     }
-    for (const tag of SORA_TAGS) {
+    for (const tag of soraTags) {
       if (trimmed === `@${tag}` || trimmed.startsWith(`@${tag} `)) {
         return false;
       }

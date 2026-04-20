@@ -1,11 +1,11 @@
 import * as ts from 'typescript';
 
-import {AnnotationReader} from '../exporter/annotation-reader';
-import {type DocRouteInfo} from './doc-collector';
+import {AnnotationReader} from '../exporter/AnnotationReader';
+import {type DocRouteInfo} from './DocCollector';
 
-const FRAMEWORK_MODULE = '@sora-soft/framework';
+const frameworkModule = '@sora-soft/framework';
 
-const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
+const validHttpMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
 export interface OpenAPIOperation {
   summary: string;
@@ -49,7 +49,7 @@ class DocTransformer {
   transform(
     program: ts.Program,
     routes: DocRouteInfo[],
-    targets: string[] | undefined,
+    targets: string[] | undefined
   ): DocTransformResult {
     const checker = program.getTypeChecker();
     const pathItems: OpenAPIPathItem[] = [];
@@ -143,8 +143,8 @@ class DocTransformer {
     if (!raw) return 'POST';
 
     const upper = raw.toUpperCase();
-    if (!VALID_HTTP_METHODS.includes(upper)) {
-      throw new Error(`${className}.${methodName}: Invalid @method "${raw}". Valid values: ${VALID_HTTP_METHODS.join(', ')}`);
+    if (!validHttpMethods.includes(upper)) {
+      throw new Error(`${className}.${methodName}: Invalid @method "${raw}". Valid values: ${validHttpMethods.join(', ')}`);
     }
     return upper;
   }
@@ -188,7 +188,7 @@ class DocTransformer {
     };
   }
 
-  private unwrapPromise(type: ts.Type, checker: ts.TypeChecker): ts.Type {
+  private unwrapPromise(type: ts.Type, _: ts.TypeChecker): ts.Type {
     if ((type as any).typeArguments && (type as any).target) {
       const symbol = type.getSymbol?.() || (type as any).symbol;
       if (symbol && symbol.name === 'Promise') {
@@ -510,7 +510,7 @@ class DocTransformer {
       if (!ts.isImportDeclaration(statement)) continue;
 
       const moduleSpecifier = (statement.moduleSpecifier as ts.StringLiteral).text;
-      const isFramework = moduleSpecifier === FRAMEWORK_MODULE ||
+      const isFramework = moduleSpecifier === frameworkModule ||
         moduleSpecifier.startsWith('@sora-soft/framework/');
 
       if (!isFramework) continue;

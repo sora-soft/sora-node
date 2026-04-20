@@ -1,11 +1,11 @@
 import {flags} from '@oclif/command';
 import path = require('path');
 
-import {BaseCommand} from '../../base';
-import {DocCollector} from '../../lib/doc/doc-collector';
-import {DocTransformer} from '../../lib/doc/doc-transformer';
-import {OpenApiEmitter} from '../../lib/doc/openapi-emitter';
-import {ProgramBuilder} from '../../lib/exporter/program-builder';
+import {BaseCommand} from '../../Base';
+import {DocCollector} from '../../lib/doc/DocCollector';
+import {DocTransformer} from '../../lib/doc/DocTransformer';
+import {OpenApiEmitter} from '../../lib/doc/OpenApiEmitter';
+import {ProgramBuilder} from '../../lib/exporter/ProgramBuilder';
 
 export default class ExportDoc extends BaseCommand {
   static description = 'Export OpenAPI documentation from route classes';

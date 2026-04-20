@@ -1,12 +1,12 @@
 import {flags} from '@oclif/command';
 import path = require('path');
 
-import {BaseCommand} from '../../base';
-import {Collector} from '../../lib/exporter/collector';
-import {Emitter} from '../../lib/exporter/emitter';
-import {ProgramBuilder} from '../../lib/exporter/program-builder';
-import {Transformer} from '../../lib/exporter/transformer';
-import {TypeResolver} from '../../lib/exporter/type-resolver';
+import {BaseCommand} from '../../Base';
+import {Collector} from '../../lib/exporter/Collector';
+import {Emitter} from '../../lib/exporter/Emitter';
+import {ProgramBuilder} from '../../lib/exporter/ProgramBuilder';
+import {Transformer} from '../../lib/exporter/Transformer';
+import {TypeResolver} from '../../lib/exporter/TypeResolver';
 
 export default class ExportApi extends BaseCommand {
   static description = 'Export API type declarations';

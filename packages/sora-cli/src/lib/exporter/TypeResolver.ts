@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 
-import {transferJSDoc} from './jsdoc-utils';
-import {type TransformedDeclaration} from './transformer';
+import {transferJSDoc} from './JSDocUtils';
+import {type TransformedDeclaration} from './Transformer';
 
 interface ResolvedType {
   name: string;
@@ -59,7 +59,7 @@ class TypeResolver {
     transformedNode: ts.Node,
     originalNode: ts.Node,
     checker: ts.TypeChecker,
-    sourceFile: ts.SourceFile,
+    sourceFile: ts.SourceFile
   ) {
     if (!ts.isInterfaceDeclaration(transformedNode) || !ts.isClassDeclaration(originalNode)) return;
 
@@ -170,7 +170,7 @@ class TypeResolver {
     ts.forEachChild(node, visit);
   }
 
-  private resolveTypeReference(node: ts.TypeReferenceNode, checker: ts.TypeChecker, _sourceFile: ts.SourceFile) {
+  private resolveTypeReference(node: ts.TypeReferenceNode, checker: ts.TypeChecker, _: ts.SourceFile) {
     const typeName = node.typeName;
 
     const symbol = checker.getSymbolAtLocation(typeName);
@@ -192,7 +192,7 @@ class TypeResolver {
     }
   }
 
-  private resolveIdentifier(node: ts.Identifier, checker: ts.TypeChecker, _sourceFile: ts.SourceFile) {
+  private resolveIdentifier(node: ts.Identifier, checker: ts.TypeChecker, _: ts.SourceFile) {
     const symbol = checker.getSymbolAtLocation(node);
     if (!symbol) return;
 
@@ -216,14 +216,14 @@ class TypeResolver {
         decl.members.map(member => {
           ts.setTextRange(member, {pos: -1, end: -1});
           return transferJSDoc(member, member, declSourceFile) as ts.TypeElement;
-        }),
+        })
       );
       const exported = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.typeParameters,
         decl.heritageClauses,
-        members,
+        members
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});
@@ -235,7 +235,7 @@ class TypeResolver {
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.typeParameters,
-        decl.type,
+        decl.type
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});
@@ -246,12 +246,12 @@ class TypeResolver {
         decl.members.map(member => {
           ts.setTextRange(member, {pos: -1, end: -1});
           return transferJSDoc(member, member, declSourceFile) as ts.EnumMember;
-        }),
+        })
       );
       const exported = ts.factory.createEnumDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
-        members,
+        members
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});
@@ -274,13 +274,13 @@ class TypeResolver {
           undefined,
           member.name,
           member.questionToken,
-          member.type,
+          member.type
         );
         members.push(transferJSDoc(member, newProp, declSourceFile) as ts.TypeElement);
       }
 
       const extendsClauses = decl.heritageClauses?.filter(
-        clause => clause.token === ts.SyntaxKind.ExtendsKeyword,
+        clause => clause.token === ts.SyntaxKind.ExtendsKeyword
       );
       const heritageClauses = extendsClauses?.length ? extendsClauses : undefined;
 
@@ -289,7 +289,7 @@ class TypeResolver {
         decl.name!,
         decl.typeParameters,
         heritageClauses,
-        members,
+        members
       );
 
       const result = transferJSDoc(decl, exported, declSourceFile);
@@ -302,9 +302,9 @@ class TypeResolver {
   private resolveTypeFromDeclaration(decl: ts.Node, checker: ts.TypeChecker) {
     const symbol = checker.getSymbolAtLocation(
       ts.isInterfaceDeclaration(decl) ? decl.name :
-      ts.isTypeAliasDeclaration(decl) ? decl.name :
-      ts.isEnumDeclaration(decl) ? decl.name :
-      decl.getChildren()[0] as ts.Identifier
+        ts.isTypeAliasDeclaration(decl) ? decl.name :
+          ts.isEnumDeclaration(decl) ? decl.name :
+            decl.getChildren()[0] as ts.Identifier
     );
 
     if (!symbol) return;
@@ -319,14 +319,14 @@ class TypeResolver {
         decl.members.map(member => {
           ts.setTextRange(member, {pos: -1, end: -1});
           return transferJSDoc(member, member, declSourceFile) as ts.TypeElement;
-        }),
+        })
       );
       const exported = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.typeParameters,
         decl.heritageClauses,
-        members,
+        members
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});
@@ -339,7 +339,7 @@ class TypeResolver {
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.typeParameters,
-        decl.type,
+        decl.type
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});
@@ -351,12 +351,12 @@ class TypeResolver {
         decl.members.map(member => {
           ts.setTextRange(member, {pos: -1, end: -1});
           return transferJSDoc(member, member, declSourceFile) as ts.EnumMember;
-        }),
+        })
       );
       const exported = ts.factory.createEnumDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
-        members,
+        members
       );
       const result = transferJSDoc(decl, exported, declSourceFile);
       this.collectedTypes_.push({name, node: result, sourceFile: declSourceFile});

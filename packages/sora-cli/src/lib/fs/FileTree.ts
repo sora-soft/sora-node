@@ -59,7 +59,7 @@ class FileTree {
   }
 
   getFileList() {
-    return [...this.fileMap_.entries()].map(([filePath, file]) => file.absolutePath);
+    return [...this.fileMap_.entries()].map(([_, file]) => file.absolutePath);
   }
 
   async commit() {

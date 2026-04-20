@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 
-import {AnnotationReader} from './annotation-reader';
-import {type ExportClassInfo, type ExportPlan, type ExportSimpleInfo, ExportStrategy} from './types';
+import {AnnotationReader} from './AnnotationReader';
+import {type ExportClassInfo, type ExportPlan, type ExportSimpleInfo, ExportStrategy} from './Types';
 
 class Collector {
   collect(program: ts.Program): ExportPlan {

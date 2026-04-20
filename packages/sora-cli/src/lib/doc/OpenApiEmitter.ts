@@ -1,12 +1,11 @@
 import * as fs from 'fs';
-import * as path from 'path';
-
 import yaml from 'js-yaml';
-
-import {type OpenAPIPathItem} from './doc-transformer';
-import {type DocRouteInfo} from './doc-collector';
-import {SchemaResolver} from './schema-resolver';
+import * as path from 'path';
 import * as ts from 'typescript';
+
+import {type DocRouteInfo} from './DocCollector';
+import {type OpenAPIPathItem} from './DocTransformer';
+import {SchemaResolver} from './SchemaResolver';
 
 interface OpenAPIDocument {
   openapi: string;
@@ -23,7 +22,7 @@ interface OpenAPIDocument {
 class OpenApiEmitter {
   constructor(
     private outputBasePath: string,
-    private configDir: string,
+    private configDir: string
   ) {}
 
   emit(
@@ -31,7 +30,7 @@ class OpenApiEmitter {
     program: ts.Program,
     routes: DocRouteInfo[],
     targets: string[] | undefined,
-    format: 'yaml' | 'json' = 'yaml',
+    format: 'yaml' | 'json' = 'yaml'
   ): void {
     const checker = program.getTypeChecker();
     const resolver = new SchemaResolver(checker);
@@ -104,7 +103,7 @@ class OpenApiEmitter {
     program: ts.Program,
     routes: DocRouteInfo[],
     targets: string[] | undefined,
-    resolver: SchemaResolver,
+    resolver: SchemaResolver
   ): void {
     const checker = program.getTypeChecker();
 
