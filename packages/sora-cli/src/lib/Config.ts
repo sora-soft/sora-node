@@ -15,6 +15,7 @@ interface ISoraConfig {
   componentNameEnum: string;
   comClass: string;
   apiDeclarationOutput: string;
+  docOutput?: string;
 }
 
 class Config {

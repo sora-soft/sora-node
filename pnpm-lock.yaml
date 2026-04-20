@@ -421,6 +421,9 @@ importers:
       '@oclif/plugin-help':
         specifier: ^6.2.44
         version: 6.2.44
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       art-template:
         specifier: ^4.13.2
         version: 4.13.4
@@ -436,6 +439,9 @@ importers:
       isomorphic-git:
         specifier: ^1.21.0
         version: 1.37.5
+      js-yaml:
+        specifier: ^4.1.1
+        version: 4.1.1
       mkdirp:
         specifier: ^0.5.5
         version: 0.5.6

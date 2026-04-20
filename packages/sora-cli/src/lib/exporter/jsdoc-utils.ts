@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 
-const SORA_TAGS = new Set(['soraExport', 'soraTargets', 'soraIgnore']);
+const SORA_TAGS = new Set(['soraExport', 'soraTargets', 'soraIgnore', 'soraPrefix', 'method']);
 
 export function stripSoraTagsFromComment(commentText: string): string {
   const lines = commentText.split('\n');

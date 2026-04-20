@@ -83,6 +83,7 @@ export interface ITestRes {
 /**
  * @soraExport route
  * @soraTargets web
+ * @soraPrefix /api/v1/auth
  */
 class AuthHandler extends AuthRoute {
   /**
@@ -112,6 +113,9 @@ class AuthHandler extends AuthRoute {
     };
   }
 
+  /**
+  * @description 登录
+  */
   @Route.method
   async login(@guard body: IReqLogin) {
     const loginInfo = await Com.businessDB.manager.findOne(AccountLogin, {

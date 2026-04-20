@@ -23,6 +23,27 @@ function getTagName(tag: ts.JSDocTag): string {
 }
 
 class AnnotationReader {
+  static readPrefix(node: ts.Node): string[] | null {
+    const tags = getNodeTags(node);
+    for (const tag of tags) {
+      if (getTagName(tag) === 'soraPrefix') {
+        const comment = AnnotationReader.extractTagComment(tag);
+        return comment.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      }
+    }
+    return null;
+  }
+
+  static readHttpMethod(node: ts.Node): string | null {
+    const tags = getNodeTags(node);
+    for (const tag of tags) {
+      if (getTagName(tag) === 'method') {
+        return AnnotationReader.extractTagComment(tag).trim();
+      }
+    }
+    return null;
+  }
+
   static readDeclaration(node: ts.Node): AnnotationInfo | null {
     const tags = getNodeTags(node);
 
