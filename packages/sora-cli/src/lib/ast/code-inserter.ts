@@ -112,40 +112,6 @@ class CodeInserter {
     return result;
   }
 
-  addDatabase(comName: string, componentNameKey: string, databaseName: string) {
-    const sourceFile = ts.createSourceFile(this.file_.path, this.file_.getContent(), ts.ScriptTarget.Latest, false, ts.ScriptKind.TS);
-
-    const classDeclaration = this.getClassDeclaration(sourceFile, comName);
-    const propertyDeclaration = classDeclaration.members.filter(mem => mem.kind === ts.SyntaxKind.PropertyDeclaration);
-
-    for (const property of propertyDeclaration as ts.PropertyDeclaration[]) {
-      if (property.initializer && property.initializer.kind === ts.SyntaxKind.NewExpression) {
-        const initializer = property.initializer as ts.NewExpression;
-        if (initializer.arguments) {
-          const firstArgument = initializer.arguments[0];
-          if (firstArgument.kind === ts.SyntaxKind.PropertyAccessExpression && (firstArgument as ts.PropertyAccessExpression).name.escapedText === componentNameKey) {
-            const arrayArguments = initializer.arguments[1] as ts.ArrayLiteralExpression;
-
-            let lastEnd = false;
-            let lastSpace = false;
-            if (arrayArguments.elements.length) {
-              const lastMember = arrayArguments.elements[arrayArguments.elements.length - 1];
-              const afterLastMember = this.file_.getContent().substring(lastMember.end, arrayArguments.elements.end);
-              lastEnd = afterLastMember.includes(',');
-              if (afterLastMember.endsWith(' '))
-                lastSpace = true;
-            }
-            this.file_.modify({
-              start: arrayArguments.elements.end,
-              end: arrayArguments.elements.end,
-              content: `${lastEnd ? lastSpace ? '' : ' ' : ', '}${databaseName}`,
-            });
-          }
-        }
-      }
-    }
-  }
-
   private getClassDeclaration(sourceFile: ts.SourceFile, className: string) {
     for (const statement of sourceFile.statements) {
       if (statement.kind === ts.SyntaxKind.ClassDeclaration) {
