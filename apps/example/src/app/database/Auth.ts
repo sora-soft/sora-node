@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn} from '@sora-soft/database-component/typeorm';
-import {UnixTime} from '@sora-soft/framework';
+import {Export, UnixTime} from '@sora-soft/framework';
 
 import {type AuthGroupId, PermissionResult} from '../account/AccountType.js';
 import type {Timestamp} from './utility/Type.js';
@@ -7,6 +7,7 @@ import type {Timestamp} from './utility/Type.js';
 @Entity({
   engine: 'InnoDB AUTO_INCREMENT=1000',
 })
+@Export.entity()
 export class AuthGroup {
   constructor(data?: Partial<AuthGroup>) {
     if (!data)
@@ -44,6 +45,7 @@ export class AuthGroup {
 }
 
 @Entity()
+@Export.entity()
 export class AuthPermission {
   constructor(data?: Partial<AuthPermission>) {
     if (!data)

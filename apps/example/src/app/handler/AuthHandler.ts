@@ -1,4 +1,4 @@
-import {Route, UnixTime} from '@sora-soft/framework';
+import {Export, Route, UnixTime} from '@sora-soft/framework';
 import {guard} from '@sora-soft/typia-decorator';
 
 import {Com} from '../../lib/Com.js';
@@ -76,7 +76,9 @@ export interface IReqLogin {
   remember: boolean;
 }
 
+@Export.route(['web'])
 class AuthHandler extends AuthRoute {
+  // 注释
   @Route.method
   async register(@guard body: IReqRegister) {
     const account = await AccountWorld.createAccount(

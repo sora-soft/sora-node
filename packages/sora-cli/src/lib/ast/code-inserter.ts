@@ -1,8 +1,8 @@
 import * as ts from 'typescript';
 
-import {type ScriptFileNode} from './fs/ScriptFileNode';
+import {type ScriptFileNode} from '../fs/ScriptFileNode';
 
-class AST {
+class CodeInserter {
   constructor(file: ScriptFileNode) {
     this.file_ = file;
     this.printer_ = ts.createPrinter({
@@ -174,4 +174,4 @@ class AST {
   private printer_: ts.Printer;
 }
 
-export {AST};
+export {CodeInserter};

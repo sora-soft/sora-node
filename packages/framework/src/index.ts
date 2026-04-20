@@ -22,6 +22,7 @@ export * from './lib/context/scope/RootScope.js';
 export * from './lib/context/scope/WorkerScope.js';
 export * from './lib/discovery/Discovery.js';
 export * from './lib/Election.js';
+export * from './lib/export/Export.js';
 export * from './lib/FrameworkLogger.js';
 export * from './lib/handler/NodeHandler.js';
 export * from './lib/logger/ConsoleOutput.js';

@@ -1,9 +1,10 @@
 import {promises as fs} from 'fs';
-
-import {FileNode} from './FileNode';
 import mkdirp = require('mkdirp');
 import pathModule = require('path');
 const path = pathModule;
+
+import {FileNode} from './FileNode';
+import {type FileTree} from './FileTree';
 
 export interface IChange {
   start: number;

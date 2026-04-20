@@ -23,7 +23,6 @@ class FileTree {
     return this.fileMap_.get(filePath);
   }
 
-  // git add
   addFile(file: FileNode) {
     this.changes_.add(file);
   }

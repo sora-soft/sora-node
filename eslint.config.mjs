@@ -65,7 +65,6 @@ export default [
       }],
       "@typescript-eslint/naming-convention": [
         "error",
-        // 1. 优先级最高：允许任何只由下划线组成的 变量 或 参数
         {
           "selector": ["variable", "parameter"],
           "filter": {
@@ -74,32 +73,26 @@ export default [
           },
           "format": null
         },
-        // 2. 强制要求 Interface 使用 PascalCase
         {
           "selector": "interface",
           "format": ["PascalCase"]
         },
-        // 3. 强制要求 Enum 成员使用 PascalCase
         {
           "selector": "enumMember",
           "format": ["PascalCase"]
         },
-        // 4. 普通变量必须使用 camelCase
         {
           "selector": "variable",
           "format": ["camelCase"]
         },
-        // 5. 普通参数必须使用 camelCase (解决之前 Packet 的报错)
         {
           "selector": "parameter",
           "format": ["camelCase"]
         },
-        // 6. 函数与方法
         {
           "selector": ["function", "method"],
           "format": ["camelCase"]
         },
-        // 7. 类名等类型
         {
           "selector": "typeLike",
           "format": ["PascalCase"]

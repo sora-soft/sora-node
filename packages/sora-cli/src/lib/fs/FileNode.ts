@@ -1,7 +1,8 @@
 import {promises as fs} from 'fs';
 import mkdirp = require('mkdirp');
-import {type FileTree} from './FileTree';
 import path = require('path');
+
+import {type FileTree} from './FileTree';
 
 class FileNode {
   constructor(subPath: string, tree: FileTree) {

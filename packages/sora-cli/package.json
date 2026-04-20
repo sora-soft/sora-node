@@ -1,6 +1,6 @@
 {
   "name": "@sora-soft/sora-cli",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "sora system cli tool",
   "bin": {
     "sora": "./bin/cli.js"
@@ -18,19 +18,32 @@
   ],
   "author": "yaya",
   "license": "WTFPL",
+  "files": [
+    "/bin",
+    "/dist",
+    "/template"
+  ],
+  "oclif": {
+    "commands": "./dist/commands",
+    "bin": "sora",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
   "dependencies": {
+    "@oclif/command": "^1.8.36",
+    "@oclif/config": "^1.18.17",
+    "@oclif/errors": "^1.3.6",
+    "@oclif/help": "^1.0.1",
+    "@oclif/plugin-help": "^6.2.44",
     "art-template": "^4.13.2",
     "camelcase": "^6.2.0",
     "chalk": "^4.1.2",
-    "commander": "^7.2.0",
-    "download-git-repo": "^3.0.2",
     "inquirer": "^8.0.0",
     "isomorphic-git": "^1.21.0",
     "mkdirp": "^0.5.5",
     "ora": "^5.4.0",
-    "source-map-support": "^0.5.19",
-    "ts-morph": "^28.0.0",
-    "tsutils": "^3.21.0"
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@types/inquirer": "^7.3.1",

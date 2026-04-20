@@ -1,4 +1,5 @@
 import {Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from '@sora-soft/database-component/typeorm';
+import {Export} from '@sora-soft/framework';
 
 import {type AccountId, AccountLoginType, type AuthGroupId} from '../account/AccountType.js';
 import {AuthGroup} from './Auth.js';
@@ -7,6 +8,7 @@ import type {Timestamp} from './utility/Type.js';
 @Entity()
 @Index('accountId_idx', ['accountId'])
 @Index('expireAt_idx', ['expireAt'])
+@Export.entity()
 export class AccountToken {
   constructor(data?: Partial<AccountToken>) {
     if (!data)
@@ -29,6 +31,7 @@ export class AccountToken {
 
 @Entity()
 @Index('type_username_idx', ['type', 'username'], {unique: true})
+@Export.entity()
 export class AccountLogin {
   constructor(data?: Partial<AccountLogin>) {
     if (!data)
@@ -58,6 +61,7 @@ export class AccountLogin {
 @Entity({
   engine: 'InnoDB AUTO_INCREMENT=1000',
 })
+@Export.entity()
 export class Account {
   constructor(data?: Partial<Account>) {
     if (!data)
@@ -101,6 +105,7 @@ export class Account {
 @Entity()
 @Index('IDX_82353795ba05400818e15bc26b', ['accountId'])
 @Index('IDX_df6873242d7ce56e52a05fc0e5', ['groupId'])
+@Export.entity()
 export class AccountAuthGroup {
   constructor(data?: Partial<AccountAuthGroup>) {
     if (!data)

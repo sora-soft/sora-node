@@ -10,6 +10,9 @@
     "resolveJsonModule": true,
     "alwaysStrict": true,
     "downlevelIteration": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "plugins": []
   },
   "include": [

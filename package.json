@@ -12,6 +12,15 @@
     "typescript": "~5.9.3",
 		"@types/node": "^24.0.0"
   },
+  "pnpm": {
+    "packageExtensions": {
+      "@oclif/errors": {
+        "dependencies": {
+          "chalk": "^4"
+        }
+      }
+    }
+  },
   "dependencies": {
     "typia": "^12.0.2"
   },

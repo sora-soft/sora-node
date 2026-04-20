@@ -15,24 +15,12 @@ interface ISoraConfig {
   componentNameEnum: string;
   comClass: string;
   apiDeclarationOutput: string;
-  userErrorCodeEnum: string;
-  customEnum?: string[];
-}
-
-interface ICliConfig {
-  indentation: string;
 }
 
 class Config {
   async load() {
-    // await this.loadCliConfig();
     await this.loadSoraConfig();
     await this.loadTSConfig();
-  }
-
-  async loadCliConfig() {
-    this.cliConfigPath_ = process.cwd();
-    this.cliConfig_ = await import(path.resolve(this.cliConfigPath_, 'sora-cli.json'));
   }
 
   async loadSoraConfig() {
@@ -53,10 +41,6 @@ class Config {
     return this.soraConfig_;
   }
 
-  get cli() {
-    return this.cliConfig_;
-  }
-
   get soraRoot() {
     return path.resolve(this.soraConfigPath_, this.sora.root);
   }
@@ -67,8 +51,6 @@ class Config {
 
   private soraConfig_!: ISoraConfig;
   private soraConfigPath_!: string;
-  private cliConfigPath_!: string;
-  private cliConfig_!: ICliConfig;
   private tsConfig_!: ts.CompilerOptions;
 }
 
