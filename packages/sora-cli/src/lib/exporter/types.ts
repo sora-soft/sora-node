@@ -1,19 +1,6 @@
 export enum ExportStrategy {
   Route = 'route',
   Entity = 'entity',
-  Generic = 'generic',
-  Enum = 'enum',
-}
-
-export interface MethodDecorationInfo {
-  methodName: string;
-  modes: string[] | null;
-  isRouteMethod: boolean;
-}
-
-export interface PropertyDecorationInfo {
-  propertyName: string;
-  modes: string[] | null;
 }
 
 export interface ExportClassInfo {
@@ -21,21 +8,21 @@ export interface ExportClassInfo {
   className: string;
   strategy: ExportStrategy;
   modes: string[];
-  methodDecorations: MethodDecorationInfo[];
-  propertyDecorations: PropertyDecorationInfo[];
 }
 
-export interface ExportEnumInfo {
+export type SimpleExportKind = 'class' | 'enum' | 'interface' | 'type';
+
+export interface ExportSimpleInfo {
   filePath: string;
-  enumName: string;
+  name: string;
+  kind: SimpleExportKind;
   modes: string[];
 }
 
 export interface ExportPlan {
   routes: ExportClassInfo[];
   entities: ExportClassInfo[];
-  generics: ExportClassInfo[];
-  enums: ExportEnumInfo[];
+  simple: ExportSimpleInfo[];
 }
 
 export interface RouteExportInfo {

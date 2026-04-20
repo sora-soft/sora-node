@@ -16,14 +16,108 @@ class TypeResolver {
     const checker = program.getTypeChecker();
 
     for (const decl of declarations) {
-      this.collectTypeDependencies(decl.node, checker, decl.sourceFile);
+      this.collectFromTransformed(decl, checker);
     }
 
     return this.collectedTypes_;
   }
 
   resolveForTargets(program: ts.Program, declarations: TransformedDeclaration[]): ResolvedType[] {
-    return this.resolve(program, declarations);
+    const checker = program.getTypeChecker();
+
+    for (const decl of declarations) {
+      this.collectFromTransformed(decl, checker);
+    }
+
+    return this.collectedTypes_;
+  }
+
+  private collectFromTransformed(decl: TransformedDeclaration, checker: ts.TypeChecker) {
+    this.collectTypeDependencies(decl.node, checker, decl.sourceFile);
+
+    if (decl.originalNode) {
+      this.resolveSyntheticReturnTypes(decl.node, decl.originalNode, checker, decl.sourceFile);
+    }
+  }
+
+  private resolveSyntheticReturnTypes(
+    transformedNode: ts.Node,
+    originalNode: ts.Node,
+    checker: ts.TypeChecker,
+    sourceFile: ts.SourceFile,
+  ) {
+    if (!ts.isClassDeclaration(transformedNode) || !ts.isClassDeclaration(originalNode)) return;
+
+    const transformedMethods = new Map<string, ts.MethodDeclaration>();
+    for (const m of transformedNode.members) {
+      if (ts.isMethodDeclaration(m) && m.name) {
+        transformedMethods.set(m.name.getText(sourceFile), m);
+      }
+    }
+
+    for (const originalMethod of originalNode.members) {
+      if (!ts.isMethodDeclaration(originalMethod) || !originalMethod.name) continue;
+      const methodName = originalMethod.name.getText(sourceFile);
+      const transformedMethod = transformedMethods.get(methodName);
+      if (!transformedMethod) continue;
+
+      if (originalMethod.type) {
+        this.collectTypeDependencies(originalMethod.type, checker, sourceFile);
+      } else {
+        const signature = checker.getSignatureFromDeclaration(originalMethod);
+        if (signature) {
+          const returnType = signature.getReturnType();
+          const symbols = returnType.aliasSymbol ? [returnType.aliasSymbol] :
+            !returnType.aliasSymbol && returnType.symbol ? this.expandTypeSymbols(returnType, checker) : [];
+          for (const sym of symbols) {
+            this.resolveSymbolDeclaration(sym, checker);
+          }
+        }
+      }
+
+      if (transformedMethod.parameters.length > 0) {
+        for (const p of transformedMethod.parameters) {
+          if (p.type) {
+            this.collectTypeDependencies(p.type, checker, sourceFile);
+          }
+        }
+      }
+    }
+  }
+
+  private expandTypeSymbols(type: ts.Type, checker: ts.TypeChecker): ts.Symbol[] {
+    const result: ts.Symbol[] = [];
+
+    if (type.isUnionOrIntersection()) {
+      for (const t of type.types) {
+        result.push(...this.expandTypeSymbols(t, checker));
+      }
+    } else if (type.symbol) {
+      result.push(type.symbol);
+    }
+
+    if ((type as any).typeArguments) {
+      for (const t of (type as any).typeArguments as ts.Type[]) {
+        result.push(...this.expandTypeSymbols(t, checker));
+      }
+    }
+
+    return result;
+  }
+
+  private resolveSymbolDeclaration(symbol: ts.Symbol, checker: ts.TypeChecker) {
+    if (this.visitedSymbols_.has(symbol)) return;
+
+    const declarations = this.getDeclarations(symbol, checker);
+    if (!declarations || declarations.length === 0) return;
+
+    for (const decl of declarations) {
+      const declSourceFile = decl.getSourceFile();
+      if (this.isBuiltInType(declSourceFile.fileName)) continue;
+      if (this.visitedSymbols_.has(symbol)) continue;
+      this.visitedSymbols_.add(symbol);
+      this.collectResolvedDeclaration(decl, checker, declSourceFile);
+    }
   }
 
   private getDeclarations(symbol: ts.Symbol, checker: ts.TypeChecker): ts.Declaration[] {
@@ -128,7 +222,7 @@ class TypeResolver {
       const name = decl.name.text;
       const exported = ts.factory.updateEnumDeclaration(
         decl,
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword), ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.members,
       );
@@ -192,7 +286,7 @@ class TypeResolver {
       const name = decl.name.text;
       const exported = ts.factory.updateEnumDeclaration(
         decl,
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword), ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         decl.name,
         decl.members,
       );

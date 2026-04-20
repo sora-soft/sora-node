@@ -39,33 +39,29 @@ export default class ExportApi extends BaseCommand {
 
     const transformer = new Transformer();
 
-    const allEnumDecls = fullPlan.enums.map(enumInfo => {
-      return transformer.transformEnum(program, enumInfo.enumName, enumInfo.filePath);
-    }).filter((d): d is NonNullable<typeof d> => d !== null);
-
     const fullFiltered = collector.filterByTarget(fullPlan, undefined);
-    const fullDecls = transformer.transform(program, fullFiltered.routes, fullFiltered.entities, fullFiltered.generics, undefined);
+    const fullDecls = transformer.transform(program, fullFiltered.routes, fullFiltered.entities, fullFiltered.simple, undefined);
     const fullResolver = new TypeResolver();
-    const fullTypeDeps = fullResolver.resolve(program, [...fullDecls, ...allEnumDecls]);
+    const fullTypeDeps = fullResolver.resolve(program, fullDecls);
 
     const outputPath = this.soraConfig.sora.apiDeclarationOutput;
     const absoluteOutputPath = path.resolve(this.soraConfig.soraRoot, outputPath);
 
     const emitter = new Emitter(absoluteOutputPath);
-    emitter.emitFile(fullDecls, allEnumDecls, fullTypeDeps);
+    emitter.emitFile(fullDecls, [], fullTypeDeps);
 
-    this.log(`Found ${fullFiltered.routes.length} routes, ${fullFiltered.entities.length} entities, ${fullFiltered.generics.length} generics, ${fullFiltered.enums.length} enums`);
+    this.log(`Found ${fullFiltered.routes.length} routes, ${fullFiltered.entities.length} entities, ${fullFiltered.simple.length} simple exports`);
 
     // Per-target exports
     if (targets && targets.length > 0) {
       for (const target of targets) {
         const targetFiltered = collector.filterByTarget(fullPlan, [target]);
-        const targetDecls = transformer.transform(program, targetFiltered.routes, targetFiltered.entities, targetFiltered.generics, [target]);
+        const targetDecls = transformer.transform(program, targetFiltered.routes, targetFiltered.entities, targetFiltered.simple, [target]);
         const targetResolver = new TypeResolver();
-        const targetTypeDeps = targetResolver.resolve(program, [...targetDecls, ...allEnumDecls]);
+        const targetTypeDeps = targetResolver.resolve(program, targetDecls);
 
         const targetEmitter = new Emitter(absoluteOutputPath);
-        targetEmitter.emitFile(targetDecls, allEnumDecls, targetTypeDeps, target);
+        targetEmitter.emitFile(targetDecls, [], targetTypeDeps, target);
 
         this.log(`Generated target: ${target}`);
       }

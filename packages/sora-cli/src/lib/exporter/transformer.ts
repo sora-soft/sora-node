@@ -1,14 +1,18 @@
 import * as ts from 'typescript';
 
-import {type ExportClassInfo} from './types';
+import {AnnotationReader} from './annotation-reader';
+import {type ExportClassInfo, type ExportSimpleInfo} from './types';
 
 interface TransformedDeclaration {
   name: string;
   node: ts.Node;
   sourceFile: ts.SourceFile;
+  originalNode?: ts.Node;
 }
 
 const FRAMEWORK_MODULE = '@sora-soft/framework';
+
+const SORA_TAGS = new Set(['soraExport', 'soraTargets', 'soraIgnore']);
 
 function getNodeDecorators(node: ts.Node): ts.Decorator[] {
   if (ts.canHaveDecorators(node)) {
@@ -30,12 +34,26 @@ function getNodeDecorators(node: ts.Node): ts.Decorator[] {
   return [];
 }
 
+function stripSoraTagsFromComment(commentText: string): string {
+  const lines = commentText.split('\n');
+  const filtered = lines.filter(line => {
+    const trimmed = line.trim();
+    for (const tag of SORA_TAGS) {
+      if (trimmed === `@${tag}` || trimmed.startsWith(`@${tag} `)) {
+        return false;
+      }
+    }
+    return true;
+  });
+  return filtered.join('\n').trim();
+}
+
 class Transformer {
   transform(
     program: ts.Program,
     routes: ExportClassInfo[],
     entities: ExportClassInfo[],
-    generics: ExportClassInfo[],
+    simple: ExportSimpleInfo[],
     targets?: string[],
   ): TransformedDeclaration[] {
     const results: TransformedDeclaration[] = [];
@@ -53,6 +71,7 @@ class Transformer {
         name: routeInfo.className,
         node: transformed,
         sourceFile,
+        originalNode: classDecl,
       });
     }
 
@@ -68,53 +87,91 @@ class Transformer {
         name: entityInfo.className,
         node: transformed,
         sourceFile,
+        originalNode: classDecl,
       });
     }
 
-    for (const genericInfo of generics) {
-      const sourceFile = program.getSourceFile(genericInfo.filePath);
+    for (const simpleInfo of simple) {
+      const sourceFile = program.getSourceFile(simpleInfo.filePath);
       if (!sourceFile) continue;
 
-      const classDecl = this.findClassDeclaration(sourceFile, genericInfo.className);
-      if (!classDecl) continue;
+      if (simpleInfo.kind === 'class') {
+        const classDecl = this.findClassDeclaration(sourceFile, simpleInfo.name);
+        if (!classDecl) continue;
 
-      const transformed = this.transformGenericClass(classDecl, sourceFile, genericInfo, targets);
-      results.push({
-        name: genericInfo.className,
-        node: transformed,
-        sourceFile,
-      });
+        const transformed = this.transformGenericClass(classDecl, sourceFile, targets);
+        results.push({
+          name: simpleInfo.name,
+          node: transformed,
+          sourceFile,
+        });
+      } else if (simpleInfo.kind === 'enum') {
+        const decl = this.findEnumDeclaration(sourceFile, simpleInfo.name);
+        if (!decl) continue;
+
+        const transformed = this.transformEnum(decl);
+        results.push({
+          name: simpleInfo.name,
+          node: transformed,
+          sourceFile,
+        });
+      } else if (simpleInfo.kind === 'interface') {
+        const decl = this.findInterfaceDeclaration(sourceFile, simpleInfo.name);
+        if (!decl) continue;
+
+        const transformed = this.transformInterface(decl);
+        results.push({
+          name: simpleInfo.name,
+          node: transformed,
+          sourceFile,
+        });
+      } else if (simpleInfo.kind === 'type') {
+        const decl = this.findTypeAliasDeclaration(sourceFile, simpleInfo.name);
+        if (!decl) continue;
+
+        const transformed = this.transformTypeAlias(decl);
+        results.push({
+          name: simpleInfo.name,
+          node: transformed,
+          sourceFile,
+        });
+      }
     }
 
     return results;
   }
 
-  transformEnum(
-    program: ts.Program,
-    enumName: string,
-    filePath: string,
-  ): TransformedDeclaration | null {
-    const sourceFile = program.getSourceFile(filePath);
-    if (!sourceFile) return null;
+  private transformEnum(decl: ts.EnumDeclaration): ts.EnumDeclaration {
+    const modifiers = this.ensureExport(decl);
+    return ts.factory.updateEnumDeclaration(
+      decl,
+      modifiers,
+      decl.name,
+      decl.members,
+    );
+  }
 
-    for (const statement of sourceFile.statements) {
-      if (ts.isEnumDeclaration(statement) && statement.name.text === enumName) {
-        const transformed = ts.factory.updateEnumDeclaration(
-          statement,
-          [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword), ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
-          statement.name,
-          statement.members,
-        );
+  private transformInterface(decl: ts.InterfaceDeclaration): ts.InterfaceDeclaration {
+    const modifiers = this.ensureExport(decl);
+    return ts.factory.updateInterfaceDeclaration(
+      decl,
+      modifiers,
+      decl.name,
+      decl.typeParameters,
+      decl.heritageClauses,
+      decl.members,
+    );
+  }
 
-        return {
-          name: enumName,
-          node: transformed,
-          sourceFile,
-        };
-      }
-    }
-
-    return null;
+  private transformTypeAlias(decl: ts.TypeAliasDeclaration): ts.TypeAliasDeclaration {
+    const modifiers = this.ensureExport(decl);
+    return ts.factory.updateTypeAliasDeclaration(
+      decl,
+      modifiers,
+      decl.name,
+      decl.typeParameters,
+      decl.type,
+    );
   }
 
   private transformRouteClass(
@@ -131,14 +188,10 @@ class Transformer {
       if (!ts.isMethodDeclaration(member)) continue;
       if (!member.name) continue;
 
-      const methodName = member.name.getText(sourceFile);
-      const methodDec = routeInfo.methodDecorations.find(md => md.methodName === methodName);
+      if (!this.isRouteMethod(member, routeMethodImportMap)) continue;
 
-      if (!methodDec) continue;
-
-      if (!this.isRouteMethod(member, routeMethodImportMap) && !methodDec.isRouteMethod) continue;
-
-      if (this.shouldIgnoreMember(methodDec.modes, targets)) continue;
+      const ignoreModes = AnnotationReader.readMemberIgnore(member);
+      if (ignoreModes !== null && this.shouldIgnoreMember(ignoreModes, targets)) continue;
 
       const params = member.parameters.slice(0, 1);
 
@@ -199,12 +252,8 @@ class Transformer {
         continue;
       }
 
-      const propName = member.name.getText(sourceFile);
-      const propDec = entityInfo.propertyDecorations.find(pd => pd.propertyName === propName);
-
-      if (propDec) {
-        if (this.shouldIgnoreMember(propDec.modes, targets)) continue;
-      }
+      const ignoreModes = AnnotationReader.readMemberIgnore(member);
+      if (ignoreModes !== null && this.shouldIgnoreMember(ignoreModes, targets)) continue;
 
       const newProp = ts.factory.updatePropertyDeclaration(
         member,
@@ -230,7 +279,6 @@ class Transformer {
   private transformGenericClass(
     classDecl: ts.ClassDeclaration,
     sourceFile: ts.SourceFile,
-    genericInfo: ExportClassInfo,
     targets?: string[],
   ): ts.ClassDeclaration {
     const members: ts.ClassElement[] = [];
@@ -244,23 +292,8 @@ class Transformer {
 
       if (ts.isConstructorDeclaration(member)) continue;
 
-      let shouldIgnore = false;
-
-      if (ts.isMethodDeclaration(member) && member.name) {
-        const methodName = member.name.getText(sourceFile);
-        const methodDec = genericInfo.methodDecorations.find(md => md.methodName === methodName);
-        if (methodDec) {
-          shouldIgnore = this.shouldIgnoreMember(methodDec.modes, targets);
-        }
-      } else if (ts.isPropertyDeclaration(member) && member.name) {
-        const propName = member.name.getText(sourceFile);
-        const propDec = genericInfo.propertyDecorations.find(pd => pd.propertyName === propName);
-        if (propDec) {
-          shouldIgnore = this.shouldIgnoreMember(propDec.modes, targets);
-        }
-      }
-
-      if (shouldIgnore) continue;
+      const ignoreModes = AnnotationReader.readMemberIgnore(member);
+      if (ignoreModes !== null && this.shouldIgnoreMember(ignoreModes, targets)) continue;
 
       if (ts.isMethodDeclaration(member)) {
         const newMethod = ts.factory.updateMethodDeclaration(
@@ -374,12 +407,50 @@ class Transformer {
     return null;
   }
 
+  private findEnumDeclaration(sourceFile: ts.SourceFile, name: string): ts.EnumDeclaration | null {
+    for (const statement of sourceFile.statements) {
+      if (ts.isEnumDeclaration(statement) && statement.name.text === name) {
+        return statement;
+      }
+    }
+    return null;
+  }
+
+  private findInterfaceDeclaration(sourceFile: ts.SourceFile, name: string): ts.InterfaceDeclaration | null {
+    for (const statement of sourceFile.statements) {
+      if (ts.isInterfaceDeclaration(statement) && statement.name.text === name) {
+        return statement;
+      }
+    }
+    return null;
+  }
+
+  private findTypeAliasDeclaration(sourceFile: ts.SourceFile, name: string): ts.TypeAliasDeclaration | null {
+    for (const statement of sourceFile.statements) {
+      if (ts.isTypeAliasDeclaration(statement) && statement.name.text === name) {
+        return statement;
+      }
+    }
+    return null;
+  }
+
   private hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
     if (ts.canHaveModifiers(node)) {
       const modifiers = ts.getModifiers(node) || [];
       return modifiers.some(m => m.kind === kind);
     }
     return false;
+  }
+
+
+  private ensureExport(node: ts.Declaration): ts.ModifierLike[] {
+    const existing = ts.canHaveModifiers(node) ? (ts.getModifiers(node) || []) : [];
+    const hasExport = existing.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+
+    const result: ts.ModifierLike[] = [];
+    if (!hasExport) result.push(ts.factory.createModifier(ts.SyntaxKind.ExportKeyword));
+    result.push(...existing);
+    return result;
   }
 
   private updateParameters(params: readonly ts.ParameterDeclaration[], _sourceFile: ts.SourceFile): ts.NodeArray<ts.ParameterDeclaration> {

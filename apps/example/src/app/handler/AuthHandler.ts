@@ -1,4 +1,4 @@
-import {Export, Route, UnixTime} from '@sora-soft/framework';
+import {Route, UnixTime} from '@sora-soft/framework';
 import {guard} from '@sora-soft/typia-decorator';
 
 import {Com} from '../../lib/Com.js';
@@ -76,7 +76,16 @@ export interface IReqLogin {
   remember: boolean;
 }
 
-@Export.route(['web'])
+export interface ITestRes {
+  account?: Account;
+}
+
+/**
+ * @soraExport route
+ * @soraTargets web
+ * @param {*} width
+ * @returns
+ */
 class AuthHandler extends AuthRoute {
   // 注释
   @Route.method
@@ -351,6 +360,11 @@ class AuthHandler extends AuthRoute {
     await Com.businessRedis.client.del(RedisKey.resetPasswordCode(body.id));
 
     return {};
+  }
+
+  @Route.method
+  async test() {
+    return {} as ITestRes;
   }
 }
 

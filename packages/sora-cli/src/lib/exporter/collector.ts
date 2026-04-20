@@ -1,18 +1,15 @@
 import * as ts from 'typescript';
 
-import {DecoratorReader} from './decorator-reader';
-import {type ExportClassInfo, type ExportEnumInfo, type ExportPlan} from './types';
+import {AnnotationReader} from './annotation-reader';
+import {type ExportClassInfo, type ExportPlan, type ExportSimpleInfo, ExportStrategy} from './types';
 
 class Collector {
   collect(program: ts.Program): ExportPlan {
     const plan: ExportPlan = {
       routes: [],
       entities: [],
-      generics: [],
-      enums: [],
+      simple: [],
     };
-
-    const checker = program.getTypeChecker();
 
     for (const sourceFile of program.getSourceFiles()) {
       if (sourceFile.isDeclarationFile) continue;
@@ -36,7 +33,7 @@ class Collector {
       });
     };
 
-    const filterEnums = (items: ExportEnumInfo[]) => {
+    const filterSimple = (items: ExportSimpleInfo[]) => {
       return items.filter(item => {
         if (item.modes.length === 0) return true;
         return targets.some(t => item.modes.includes(t));
@@ -46,33 +43,71 @@ class Collector {
     return {
       routes: filterClass(plan.routes),
       entities: filterClass(plan.entities),
-      generics: filterClass(plan.generics),
-      enums: filterEnums(plan.enums),
+      simple: filterSimple(plan.simple),
     };
   }
 
   private visitSourceFile(sourceFile: ts.SourceFile, plan: ExportPlan) {
     ts.forEachChild(sourceFile, (node) => {
       if (ts.isClassDeclaration(node)) {
-        const info = DecoratorReader.readClassDeclaration(node, sourceFile, sourceFile.fileName);
-        if (info) {
-          switch (info.strategy) {
-            case 'route':
-              plan.routes.push(info);
-              break;
-            case 'entity':
-              plan.entities.push(info);
-              break;
-            case 'generic':
-              plan.generics.push(info);
-              break;
-          }
+        const info = AnnotationReader.readDeclaration(node);
+        if (!info) return;
+
+        const className = node.name?.text;
+        if (!className) return;
+
+        if (info.type === 'route') {
+          plan.routes.push({
+            filePath: sourceFile.fileName,
+            className,
+            strategy: ExportStrategy.Route,
+            modes: info.modes,
+          });
+        } else if (info.type === 'entity') {
+          plan.entities.push({
+            filePath: sourceFile.fileName,
+            className,
+            strategy: ExportStrategy.Entity,
+            modes: info.modes,
+          });
+        } else {
+          plan.simple.push({
+            filePath: sourceFile.fileName,
+            name: className,
+            kind: 'class',
+            modes: info.modes,
+          });
         }
       } else if (ts.isEnumDeclaration(node)) {
-        const info = DecoratorReader.readEnumDeclaration(node, sourceFile, sourceFile.fileName);
-        if (info) {
-          plan.enums.push(info);
-        }
+        const info = AnnotationReader.readDeclaration(node);
+        if (!info) return;
+
+        plan.simple.push({
+          filePath: sourceFile.fileName,
+          name: node.name.text,
+          kind: 'enum',
+          modes: info.modes,
+        });
+      } else if (ts.isInterfaceDeclaration(node)) {
+        const info = AnnotationReader.readDeclaration(node);
+        if (!info) return;
+
+        plan.simple.push({
+          filePath: sourceFile.fileName,
+          name: node.name.text,
+          kind: 'interface',
+          modes: info.modes,
+        });
+      } else if (ts.isTypeAliasDeclaration(node)) {
+        const info = AnnotationReader.readDeclaration(node);
+        if (!info) return;
+
+        plan.simple.push({
+          filePath: sourceFile.fileName,
+          name: node.name.text,
+          kind: 'type',
+          modes: info.modes,
+        });
       }
     });
   }

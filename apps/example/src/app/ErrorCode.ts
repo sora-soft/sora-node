@@ -1,6 +1,6 @@
-import {Export} from '@sora-soft/framework';
-
-@Export.declare()
+/**
+ * @soraExport
+ */
 export enum AppErrorCode {
   ErrUnknown = 'ERR_UNKNOWN',
   ErrLoadConfig = 'ERR_LOAD_CONFIG',
@@ -16,7 +16,9 @@ export enum AppErrorCode {
   ErrServerInternal = 'ERR_SERVER_INTERNAL',
 }
 
-@Export.declare()
+/**
+ * @soraExport
+ */
 export enum UserErrorCode {
   ErrDuplicateRegister = 'ERR_DUPLICATE_REGISTER',
   ErrUsernameNotFound = 'ERR_USERNAME_NOT_FOUND',

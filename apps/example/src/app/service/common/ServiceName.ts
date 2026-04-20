@@ -1,6 +1,6 @@
-import {Export} from '@sora-soft/framework';
-
-@Export.declare()
+/**
+ * @soraExport
+ */
 export enum ServiceName {
   HttpGateway = 'http-gateway',
   Auth = 'auth',
