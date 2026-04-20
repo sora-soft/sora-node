@@ -39,7 +39,7 @@ export default class GenerateCommand extends BaseCommand {
     const [workerNameFilePath, workerNameEnum] = this.soraConfig.sora.workerNameEnum.split('#');
     const workerFilePath = path.join(this.soraConfig.sora.workerDir, `${upperCamelCaseWorkerName}CommandWorker`);
     const workerFileExPath = path.join(this.soraConfig.sora.workerDir, `${upperCamelCaseWorkerName}CommandWorker.ts`);
-    const workerNameWorkerRelativePath = Utility.resolveImportPath(workerFileExPath, workerNameFilePath);
+    const workerNameWorkerRelativePath = Utility.resolveImportPath(workerFileExPath, workerNameFilePath) + '.js';
 
     const [workerRegisterFilePath, registerMethodPath] = this.soraConfig.sora.workerRegister.split('#');
     const [workerRegisterClass, workerRegisterMethod] = registerMethodPath.split('.');
@@ -68,7 +68,7 @@ export default class GenerateCommand extends BaseCommand {
 
     const workerRegisterFileExtPath = workerRegisterFilePath + '.ts';
     const workerRegisterFile = this.fileTree.getFile(workerRegisterFileExtPath) as ScriptFileNode;
-    const workerRegisterServiceRelativePath = Utility.resolveImportPath(workerRegisterFilePath, workerFilePath);
+    const workerRegisterServiceRelativePath = Utility.resolveImportPath(workerRegisterFilePath, workerFilePath) + '.js';
     await workerRegisterFile.load();
     const workerRegisterAST = new CodeInserter(workerRegisterFile);
     workerRegisterAST.addImport(upperCamelCaseWorkerFullName, workerRegisterServiceRelativePath, false);

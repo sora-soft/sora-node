@@ -1,10 +1,15 @@
 import {Route} from '@sora-soft/framework';
+import {guard} from '@sora-soft/typia-decorator';
 
+/**
+ * @soraExport route
+ * @soraTargets web
+ */
 class <%- handlerName %>Handler extends Route {
   @Route.method
-  async test(body: void) {
+  async test(@guard body: void) {
     return {
-      test: true
+      test: true,
     };
   }
 }

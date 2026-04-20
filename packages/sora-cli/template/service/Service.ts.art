@@ -1,11 +1,17 @@
-import {<%- serviceNameEnum %>} from '<%- serviceNameServiceRelativePath %>';
-import {IServiceOptions, Node<% if (standalone) { %>, SingletonService<% } else { %>, Service<% } %>} from '@sora-soft/framework';<% if (listeners.length > 0) { %>
-import {Route<% listeners.forEach(function(l) { %><% if (l === 'tcp') { %>, TCPListener, type ITCPListenerOptions<% } %><% if (l === 'websocket') { %>, WebSocketListener, type IWebSocketListenerOptions<% } %><% if (l === 'http') { %>, HTTPListener, type IHTTPListenerOptions<% } %><% }) %>} from '@sora-soft/framework';<% } %>
-<% if (listeners.length > 0) { %>import {<%- handlerName %>Handler} from '<%- handlerRelativePath %>';
-<% } %>import typia from 'typia';
+import {type IServiceOptions<% if (listeners.length > 0) { %>, JsonBufferCodec<% } %>, Node<% if (standalone) { %>, SingletonService<% } else { %>, Service<% } %>} from '@sora-soft/framework';<% if (listeners.length > 0) { %><% const hasTcp = listeners.includes('tcp'); %><% const hasWs = listeners.includes('websocket'); %><% const hasHttp = listeners.includes('http'); %>
+import {<% if (hasTcp) { %>type ITCPListenerOptions, <% } %>Route<% if (hasTcp) { %>, TCPListener<% } %>} from '@sora-soft/framework';<% if (hasWs) { %>
+import {type IWebSocketListenerOptions, WebSocketListener} from '@sora-soft/http-support';<% } %><% if (hasHttp) { %>
+import {HTTPListener, type IHTTPListenerOptions} from '@sora-soft/http-support';
+import Koa from '@sora-soft/http-support/koa';<% } %><% } %>
+import typia from 'typia';
+<% if (listeners.length > 0) { %>
+import {<%- handlerName %>Handler} from '<%- handlerRelativePath %>';
+<% } %>import {<%- serviceNameEnum %>} from '<%- serviceNameServiceRelativePath %>';
 
-export interface I<%- upperCamelCaseServiceName %>Options extends IServiceOptions {<% if (listeners.length > 0) { %><% listeners.forEach(function(l) { %>
-  <% if (l === 'tcp') { %>tcpListener: ITCPListenerOptions;<% } %><% if (l === 'websocket') { %>websocketListener: IWebSocketListenerOptions;<% } %><% if (l === 'http') { %>httpListener: IHTTPListenerOptions;<% } %><% }) %><% } %>
+export interface I<%- upperCamelCaseServiceName %>Options extends IServiceOptions {<% if (listeners.length > 0) { %><% if (listeners.includes('tcp')) { %>
+  tcpListener: ITCPListenerOptions;<% } %><% if (listeners.includes('websocket')) { %>
+  websocketListener: IWebSocketListenerOptions;<% } %><% if (listeners.includes('http')) { %>
+  httpListener: IHTTPListenerOptions;<% } %><% } %>
 }
 
 class <%- upperCamelCaseServiceName %>Service extends <% if (standalone) { %>SingletonService<% } else { %>Service<% } %> {
@@ -21,13 +27,14 @@ class <%- upperCamelCaseServiceName %>Service extends <% if (standalone) { %>Sin
   }
 
   protected async startup() {<% if (listeners.length > 0) { %>
-    const route = new <%- handlerName %>Handler(this);<% listeners.forEach(function(l) { %><% if (l === 'tcp') { %>
-    const tcpListener = new TCPListener(this.options_.tcpListener, Route.callback(route));
-    await this.installListener(tcpListener);<% } %><% if (l === 'websocket') { %>
-    const webSocketListener = new WebSocketListener(this.options_.websocketListener, Route.callback(route));
-    await this.installListener(webSocketListener);<% } %><% if (l === 'http') { %>
-    const httpListener = new HTTPListener(this.options_.httpListener, Route.callback(route));
-    await this.installListener(httpListener);<% } %><% }) %><% } %>
+    const route = new <%- handlerName %>Handler();<% if (listeners.includes('tcp')) { %>
+    const tcpListener = new TCPListener(this.options_.tcpListener, Route.callback(route), [new JsonBufferCodec()]);
+    await this.installListener(tcpListener);<% } %><% if (listeners.includes('websocket')) { %>
+    const webSocketListener = new WebSocketListener(this.options_.websocketListener, Route.callback(route), [new JsonBufferCodec()]);
+    await this.installListener(webSocketListener);<% } %><% if (listeners.includes('http')) { %>
+    const koa = new Koa();
+    const httpListener = new HTTPListener(this.options_.httpListener, koa, Route.callback(route));
+    await this.installListener(httpListener);<% } %><% } %>
   }
 
   protected async shutdown() {}
@@ -35,4 +42,4 @@ class <%- upperCamelCaseServiceName %>Service extends <% if (standalone) { %>Sin
   declare protected options_: I<%- upperCamelCaseServiceName %>Options;
 }
 
-export {<%- upperCamelCaseServiceName %>Service}
+export {<%- upperCamelCaseServiceName %>Service};

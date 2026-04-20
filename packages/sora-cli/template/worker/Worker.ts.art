@@ -1,6 +1,7 @@
-import {<%- workerNameEnum %>} from '<%- workerNameWorkerRelativePath %>';
-import {IWorkerOptions, Node<% if (standalone) { %>, SingletonWorker<% } else { %>, Worker<% } %>} from '@sora-soft/framework';
+import {type IWorkerOptions, Node<% if (standalone) { %>, SingletonWorker<% } else { %>, Worker<% } %>} from '@sora-soft/framework';
 import typia from 'typia';
+
+import {<%- workerNameEnum %>} from '<%- workerNameWorkerRelativePath %>';
 
 export interface I<%- upperCamelCaseWorkerName %>WorkerOptions extends IWorkerOptions {
 }
@@ -24,4 +25,4 @@ class <%- upperCamelCaseWorkerName %>Worker extends <% if (standalone) { %>Singl
   declare protected options_: I<%- upperCamelCaseWorkerName %>WorkerOptions;
 }
 
-export {<%- upperCamelCaseWorkerName %>Worker}
+export {<%- upperCamelCaseWorkerName %>Worker};

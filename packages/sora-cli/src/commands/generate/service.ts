@@ -88,7 +88,7 @@ export default class GenerateService extends BaseCommand {
     const [serviceNameFilePath, serviceNameEnum] = this.soraConfig.sora.serviceNameEnum.split('#');
     const serviceFilePath = path.join(this.soraConfig.sora.serviceDir, `${upperCamelCaseServiceName}Service`);
     const serviceFileExPath = path.join(this.soraConfig.sora.serviceDir, `${upperCamelCaseServiceName}Service.ts`);
-    const serviceNameServiceRelativePath = Utility.resolveImportPath(serviceFileExPath, serviceNameFilePath);
+    const serviceNameServiceRelativePath = Utility.resolveImportPath(serviceFileExPath, serviceNameFilePath) + '.js';
 
     const [serviceRegisterFilePath, registerMethodPath] = this.soraConfig.sora.serviceRegister.split('#');
     const [serviceRegisterClass, serviceRegisterMethod] = registerMethodPath.split('.');
@@ -96,7 +96,7 @@ export default class GenerateService extends BaseCommand {
     const handlerName = upperCamelCaseServiceName;
     const handlerFilePath = path.join(this.soraConfig.sora.handlerDir, `${handlerName}Handler`);
     const handlerFileExPath = handlerFilePath + '.ts';
-    const handlerRelativePath = Utility.resolveImportPath(serviceFileExPath, handlerFilePath);
+    const handlerRelativePath = Utility.resolveImportPath(serviceFileExPath, handlerFilePath) + '.js';
 
     const existedFile = this.fileTree.getFile(serviceFileExPath);
     if (existedFile)
@@ -126,7 +126,7 @@ export default class GenerateService extends BaseCommand {
 
     const serviceRegisterFileExtPath = serviceRegisterFilePath + '.ts';
     const serviceRegisterFile = this.fileTree.getFile(serviceRegisterFileExtPath) as ScriptFileNode;
-    const serviceRegisterServiceRelativePath = Utility.resolveImportPath(serviceRegisterFilePath, serviceFilePath);
+    const serviceRegisterServiceRelativePath = Utility.resolveImportPath(serviceRegisterFilePath, serviceFilePath) + '.js';
     await serviceRegisterFile.load();
     const serviceRegisterAST = new CodeInserter(serviceRegisterFile);
     serviceRegisterAST.addImport(upperCamelCaseServiceFullName, serviceRegisterServiceRelativePath, false);
