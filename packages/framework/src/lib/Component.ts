@@ -6,9 +6,12 @@ import type {ExError} from '../utility/ExError.js';
 import {FrameworkError} from '../utility/FrameworkError.js';
 import {LifeRef} from '../utility/LifeRef.js';
 import {Utility} from '../utility/Utility.js';
+import {Context} from './context/Context.js';
+import {ComponentScope} from './context/scope/ComponentScope.js';
 import {Logger} from './logger/Logger.js';
 import {Runtime} from './Runtime.js';
 
+@Context.scopeClass
 abstract class Component {
   constructor() {
     this.id_ = v4();
@@ -16,6 +19,7 @@ abstract class Component {
     this.ref_ = new LifeRef();
     this.name_ = 'not-set';
     this.options_ = {};
+    this.scope_ = new ComponentScope({component: this});
   }
 
   protected abstract setOptions(options: IComponentOptions): void;
@@ -87,11 +91,16 @@ abstract class Component {
     });
   }
 
+  get scope() {
+    return this.scope_;
+  }
+
   protected id_: string;
   protected name_: string;
   protected options_: IComponentOptions;
   protected ref_: LifeRef<void>;
   private init_: boolean;
+  private scope_: ComponentScope;
   // private ref_: number;
 }
 

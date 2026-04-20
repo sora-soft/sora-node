@@ -20,9 +20,8 @@ class AuthCommandWorker extends Worker {
   }
 
   constructor(name: string, options: IAuthCommandWorkerOptions) {
-    super(name, options);
     typia.assert<IAuthCommandWorkerOptions>(options);
-    this.options_ = options;
+    super(name, options);
   }
 
   protected async startup() {
@@ -60,7 +59,7 @@ class AuthCommandWorker extends Worker {
     return true;
   }
 
-  private options_: IAuthCommandWorkerOptions;
+  declare protected options_: IAuthCommandWorkerOptions;
 }
 
 export {AuthCommandWorker};

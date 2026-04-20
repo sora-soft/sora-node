@@ -22,9 +22,8 @@ class AuthService extends Service {
   }
 
   constructor(name: string, options: IAuthOptions) {
-    super(name, options);
     typia.assert<IAuthOptions>(options);
-    this.authOptions_ = options;
+    super(name, options);
   }
 
   protected async startup() {
@@ -33,7 +32,7 @@ class AuthService extends Service {
     await AccountWorld.startup();
 
     const route = new AuthHandler(this);
-    const listener = new TCPListener(this.authOptions_.tcpListener, Route.callback(route), [new JsonBufferCodec()]);
+    const listener = new TCPListener(this.options_.tcpListener, Route.callback(route), [new JsonBufferCodec()]);
     await this.installListener(listener);
 
     this.doJobInterval(async () => {
@@ -46,7 +45,7 @@ class AuthService extends Service {
 
   protected async shutdown() {}
 
-  private authOptions_: IAuthOptions;
+  declare protected options_: IAuthOptions;
 }
 
 export {AuthService};

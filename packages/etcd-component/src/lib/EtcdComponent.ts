@@ -1,4 +1,4 @@
-import {Component, ComponentScope, Context, ExError, FrameworkError, FrameworkErrorCode, type IComponentOptions, type IEventEmitter, Retry, RetryEvent, Runtime} from '@sora-soft/framework';
+import {Component, Context, ExError, FrameworkError, FrameworkErrorCode, type IComponentOptions, type IEventEmitter, Retry, RetryEvent, Runtime} from '@sora-soft/framework';
 import {guard} from '@sora-soft/typia-decorator';
 import {Etcd3, type IOptions, Lease, Lock} from 'etcd3';
 import Event from 'events';
@@ -15,7 +15,6 @@ export interface IEtcdComponentOptions extends IComponentOptions {
   prefix: string;
 }
 
-@Context.scopeClass
 class EtcdComponent extends Component {
   constructor() {
     super();
@@ -23,7 +22,6 @@ class EtcdComponent extends Component {
     this.emitter_ = new Event.EventEmitter();
     this.reconnecting_ = false;
     this.destroyed_ = false;
-    this.scope_ = new ComponentScope({component: this});
   }
 
   protected setOptions(@guard options: IEtcdComponentOptions) {
@@ -186,10 +184,6 @@ class EtcdComponent extends Component {
     return this.etcdOptions_.prefix;
   }
 
-  get scope() {
-    return this.scope_;
-  }
-
   private etcd_?: Etcd3 | null;
   private etcdOptions_?: IEtcdComponentOptions;
   private lease_?: Lease | null;
@@ -197,7 +191,6 @@ class EtcdComponent extends Component {
   private persistValues_: Map<string, string>;
   private reconnecting_: boolean;
   private destroyed_: boolean;
-  private scope_: ComponentScope;
 }
 
 export {EtcdComponent};

@@ -29,9 +29,8 @@ class HttpGatewayService extends Service {
   }
 
   constructor(name: string, options: IHttpGatewayOptions) {
-    super(name, options);
     typia.assert<IHttpGatewayOptions>(options);
-    this.gatewayOptions_ = options;
+    super(name, options);
   }
 
   protected async startup() {
@@ -42,11 +41,11 @@ class HttpGatewayService extends Service {
       [ServiceName.Auth]: Pvd.auth,
     });
     const koa = new Koa();
-    if (this.gatewayOptions_.httpListener) {
-      this.httpListener_ = new HTTPListener(this.gatewayOptions_.httpListener, koa, ForwardRoute.callback(route), this.gatewayOptions_.httpListener.labels);
+    if (this.options_.httpListener) {
+      this.httpListener_ = new HTTPListener(this.options_.httpListener, koa, ForwardRoute.callback(route), this.options_.httpListener.labels);
     }
-    if (this.gatewayOptions_.websocketListener) {
-      this.websocketListener_ = new WebSocketListener(this.gatewayOptions_.websocketListener, ForwardRoute.callback(route), [new JsonBufferCodec()], this.gatewayOptions_.websocketListener.labels);
+    if (this.options_.websocketListener) {
+      this.websocketListener_ = new WebSocketListener(this.options_.websocketListener, ForwardRoute.callback(route), [new JsonBufferCodec()], this.options_.websocketListener.labels);
     }
 
     this.registerTraefikListener();
@@ -61,13 +60,13 @@ class HttpGatewayService extends Service {
   }
 
   private registerTraefikListener() {
-    if (this.gatewayOptions_.traefik) {
-      const nameInTraefik = `${this.gatewayOptions_.traefik.name || Application.appName.replace('@', '-')}:${this.name}`;
+    if (this.options_.traefik) {
+      const nameInTraefik = `${this.options_.traefik.name || Application.appName.replace('@', '-')}:${this.name}`;
       if (this.httpListener_) {
-        TraefikWorld.registerTraefikListener(this.gatewayOptions_.traefik.prefix, 'http', `${nameInTraefik}:http`, this.httpListener_);
+        TraefikWorld.registerTraefikListener(this.options_.traefik.prefix, 'http', `${nameInTraefik}:http`, this.httpListener_);
       }
       if (this.websocketListener_) {
-        TraefikWorld.registerTraefikListener(this.gatewayOptions_.traefik.prefix, 'http', `${nameInTraefik}:websocket`, this.websocketListener_);
+        TraefikWorld.registerTraefikListener(this.options_.traefik.prefix, 'http', `${nameInTraefik}:websocket`, this.websocketListener_);
       }
     }
   }
@@ -76,7 +75,7 @@ class HttpGatewayService extends Service {
     await AccountWorld.shutdown();
   }
 
-  private gatewayOptions_: IHttpGatewayOptions;
+  declare protected options_: IHttpGatewayOptions;
   private httpListener_?: HTTPListener;
   private websocketListener_?: WebSocketListener;
 }

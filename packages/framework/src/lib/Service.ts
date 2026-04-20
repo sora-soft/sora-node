@@ -15,9 +15,8 @@ import {Worker} from './Worker.js';
 
 abstract class Service extends Worker {
   constructor(name: string, options: IServiceOptions) {
-    super(name, options);
     typia.assert<IServiceOptions>(options);
-    this.serviceOptions_ = options;
+    super(name, options);
 
     this.subManager_ = new SubscriptionManager();
     this.listenerPool_ = new Map();
@@ -145,12 +144,12 @@ abstract class Service extends Worker {
   get metaData(): IServiceMetaData {
     return Utility.deepCopy({
       name: this.name,
-      alias: this.serviceOptions_.alias,
+      alias: this.options_.alias,
       id: this.id,
       nodeId: Runtime.node.id,
       state: this.state,
       startTime: this.startTime_,
-      labels: this.serviceOptions_.labels || [] as unknown as ILabels,
+      labels: this.options_.labels || [] as unknown as ILabels,
     });
   }
 
@@ -172,9 +171,9 @@ abstract class Service extends Worker {
     return this.listenerPool_;
   }
 
+  declare protected options_: IServiceOptions;
   private listenerPool_: Map<string/* id*/, Listener>;
   private discoveryExecutor_: QueueExecutor<WorkerScope>;
-  private serviceOptions_: IServiceOptions;
   private subManager_: SubscriptionManager;
 }
 

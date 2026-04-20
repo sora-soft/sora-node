@@ -36,9 +36,8 @@ class DatabaseMigrateCommandWorker extends Worker {
   }
 
   constructor(name: string, options: IDatabaseMigrateCommandWorkerOptions) {
-    super(name, options);
     typia.assert<IDatabaseMigrateCommandWorkerOptions>(options);
-    this.options_ = options;
+    super(name, options);
   }
 
   protected async startup() {}
@@ -223,7 +222,7 @@ ${downSqls.reverse().join('\n')}
     return true;
   }
 
-  private options_: IDatabaseMigrateCommandWorkerOptions;
+  declare protected options_: IDatabaseMigrateCommandWorkerOptions;
 }
 
 export {DatabaseMigrateCommandWorker};

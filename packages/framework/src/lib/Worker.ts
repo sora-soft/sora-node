@@ -1,3 +1,4 @@
+import typia from 'typia';
 import {v4 as uuid} from 'uuid';
 
 import {WorkerState} from '../Enum.js';
@@ -19,9 +20,10 @@ import {Runtime} from './Runtime.js';
 @Context.scopeClass
 abstract class Worker {
   constructor(name: string, options: IWorkerOptions) {
+    typia.assert<IWorkerOptions>(options);
     this.name_ = name;
     this.id_ = uuid();
-    this.workerOptions_ = options;
+    this.options_ = options;
     this.startTime_ = UnixTime.now();
     this.scope_ = new WorkerScope({worker: this});
     this.executor_ = new Executor(this.scope_);
@@ -193,7 +195,7 @@ abstract class Worker {
   get metaData(): IWorkerMetaData {
     return Utility.deepCopy<IWorkerMetaData>({
       name: this.name,
-      alias: this.workerOptions_.alias,
+      alias: this.options_.alias,
       state: this.state,
       id: this.id_,
       nodeId: Runtime.node.id,
@@ -205,12 +207,12 @@ abstract class Worker {
   protected executor_: Executor;
   protected intervalJobTimer_: Timer = new Timer();
   protected startTime_: number;
+  protected options_: IWorkerOptions;
+  protected scope_: WorkerScope;
   private name_: string;
   private id_: string;
   private componentPool_: Map<string/* name*/, Component> = new Map();
   private providerPool_: Map<string/* name*/, Provider> = new Map();
-  private workerOptions_: IWorkerOptions;
-  protected scope_: WorkerScope;
 }
 
 export {Worker};
