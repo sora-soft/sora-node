@@ -1,4 +1,4 @@
-import {flags as oclifFlags} from '@oclif/command';
+import {Args, Flags} from '@oclif/core';
 import inquirer = require('inquirer');
 import template = require('art-template');
 import path = require('path');
@@ -12,14 +12,14 @@ import {Utility} from '../../lib/Utility';
 export default class GenerateWorker extends BaseCommand {
   static description = 'Generate a new worker';
 
-  static args = [
-    {name: 'name', description: 'Worker name'},
-  ];
+  static args = {
+    name: Args.string({description: 'Worker name'}),
+  };
 
   static flags = {
     ...BaseCommand.flags,
-    standalone: oclifFlags.boolean({description: 'Generate as SingletonWorker'}),
-    'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
+    standalone: Flags.boolean({description: 'Generate as SingletonWorker'}),
+    'config-template': Flags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
   protected requiredConfigFields(): ConfigFieldRequirement[] {
@@ -32,7 +32,7 @@ export default class GenerateWorker extends BaseCommand {
   }
 
   async run() {
-    const {args, flags} = this.parse(GenerateWorker);
+    const {args, flags} = await this.parse(GenerateWorker);
     await this.loadConfig();
 
     let name: string | undefined = args.name as string | undefined;

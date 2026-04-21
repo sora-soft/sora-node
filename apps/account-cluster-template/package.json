@@ -55,8 +55,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@sora-soft/cli": "^1.4.1",
-    "@sora-soft/typia-decorator": "workspace:*",
+    "@sora-soft/cli": "workspace:*",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/eslint-plugin-ts": "^4.4.1",
     "@types/uuid": "^8.3.0",

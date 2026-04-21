@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const {run} = require('@oclif/command')
+const {run} = require('@oclif/core/run')
 run()
-  .then(() => require('@oclif/command/flush'))
-  .catch(require('@oclif/errors/handle'))
+  .then(() => require('@oclif/core/flush'))
+  .catch(require('@oclif/core/handle'))

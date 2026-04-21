@@ -1,4 +1,4 @@
-import {flags} from '@oclif/command';
+import {Flags} from '@oclif/core';
 import path = require('path');
 
 import {BaseCommand, type ConfigFieldRequirement} from '../../Base';
@@ -14,12 +14,12 @@ export default class ExportDoc extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    format: flags.string({
+    format: Flags.string({
       description: 'Output format: yaml or json',
       options: ['yaml', 'json'],
       default: 'yaml',
     }),
-    target: flags.string({
+    target: Flags.string({
       multiple: true,
       description: 'Target modes to include (e.g., web, admin)',
     }),
@@ -33,7 +33,7 @@ export default class ExportDoc extends BaseCommand {
   }
 
   async run() {
-    const {flags: parsedFlags} = this.parse(ExportDoc);
+    const {flags: parsedFlags} = await this.parse(ExportDoc);
     const format = (parsedFlags.format || 'yaml') as 'yaml' | 'json';
     const targets = parsedFlags.target;
     const diagnostics = new DiagnosticCollector();

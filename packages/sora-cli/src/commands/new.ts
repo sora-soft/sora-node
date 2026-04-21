@@ -1,4 +1,4 @@
-import {Command, flags} from '@oclif/command';
+import {Args, Command, Flags} from '@oclif/core';
 import inquirer = require('inquirer');
 import ora = require('ora');
 import chalk from 'chalk';
@@ -15,17 +15,17 @@ const templates = [
 export default class NewProject extends Command {
   static description = 'Create a new sora project';
 
-  static args = [
-    {name: 'name', required: true, description: 'Project name'},
-    {name: 'template', required: false, description: 'npm package name of the template (e.g. @sora-soft/example-template)'},
-  ];
+  static args = {
+    name: Args.string({required: true, description: 'Project name'}),
+    template: Args.string({required: false, description: 'npm package name of the template (e.g. @sora-soft/example-template)'}),
+  };
 
   static flags = {
-    help: flags.help({char: 'h'}),
+    help: Flags.help({char: 'h'}),
   };
 
   async run() {
-    const {args} = this.parse(NewProject);
+    const {args} = await this.parse(NewProject);
     const name = args.name as string;
 
     const stat = await fs.stat(name).catch(err => {

@@ -1,4 +1,4 @@
-import {Command, flags as oclifFlags} from '@oclif/command';
+import {Command, Flags} from '@oclif/core';
 
 import {Config} from './lib/Config';
 import {FileTree} from './lib/fs/FileTree';
@@ -10,7 +10,7 @@ export interface ConfigFieldRequirement {
 
 abstract class BaseCommand extends Command {
   static flags = {
-    help: oclifFlags.help({char: 'h'}),
+    help: Flags.help({char: 'h'}),
   };
 
   protected soraConfig_: Config | null = null;

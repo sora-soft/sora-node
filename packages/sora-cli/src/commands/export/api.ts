@@ -1,4 +1,4 @@
-import {flags} from '@oclif/command';
+import {Flags} from '@oclif/core';
 import path = require('path');
 
 import {BaseCommand, type ConfigFieldRequirement} from '../../Base';
@@ -14,7 +14,7 @@ export default class ExportApi extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    target: flags.string({
+    target: Flags.string({
       multiple: true,
       description: 'Target modes for export (e.g., web, admin)',
     }),
@@ -28,7 +28,7 @@ export default class ExportApi extends BaseCommand {
   }
 
   async run() {
-    const {flags: parsedFlags} = this.parse(ExportApi);
+    const {flags: parsedFlags} = await this.parse(ExportApi);
     const targets = parsedFlags.target;
     const diagnostics = new DiagnosticCollector();
 

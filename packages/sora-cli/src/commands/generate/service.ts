@@ -1,4 +1,4 @@
-import {flags as oclifFlags} from '@oclif/command';
+import {Args, Flags} from '@oclif/core';
 import inquirer = require('inquirer');
 import template = require('art-template');
 import path = require('path');
@@ -31,15 +31,15 @@ function parseListeners(raw: string | undefined): string[] {
 export default class GenerateService extends BaseCommand {
   static description = 'Generate a new service';
 
-  static args = [
-    {name: 'name', description: 'Service name'},
-  ];
+  static args = {
+    name: Args.string({description: 'Service name'}),
+  };
 
   static flags = {
     ...BaseCommand.flags,
-    listeners: oclifFlags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
-    standalone: oclifFlags.boolean({description: 'Generate as SingletonService'}),
-    'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
+    listeners: Flags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
+    standalone: Flags.boolean({description: 'Generate as SingletonService'}),
+    'config-template': Flags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
   protected requiredConfigFields(): ConfigFieldRequirement[] {
@@ -53,7 +53,7 @@ export default class GenerateService extends BaseCommand {
   }
 
   async run() {
-    const {args, flags} = this.parse(GenerateService);
+    const {args, flags} = await this.parse(GenerateService);
     await this.loadConfig();
 
     let name: string | undefined = args.name as string | undefined;

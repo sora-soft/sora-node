@@ -1,4 +1,4 @@
-import {flags as oclifFlags} from '@oclif/command';
+import {Flags} from '@oclif/core';
 import template = require('art-template');
 import path = require('path');
 import fs = require('fs/promises');
@@ -12,8 +12,8 @@ export default class ConfigCommand extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    template: oclifFlags.string({char: 't', description: 'Template config file', required: true}),
-    dist: oclifFlags.string({char: 'd', description: 'Output file', required: true}),
+    template: Flags.string({char: 't', description: 'Template config file', required: true}),
+    dist: Flags.string({char: 'd', description: 'Output file', required: true}),
   };
 
   protected requiredConfigFields() {
@@ -21,7 +21,7 @@ export default class ConfigCommand extends BaseCommand {
   }
 
   async run() {
-    const {flags} = this.parse(ConfigCommand);
+    const {flags} = await this.parse(ConfigCommand);
 
     await generateConfigFile({
       template: flags.template,

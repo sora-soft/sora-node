@@ -1,4 +1,4 @@
-import {flags as oclifFlags} from '@oclif/command';
+import {Args, Flags} from '@oclif/core';
 import inquirer = require('inquirer');
 import template = require('art-template');
 import path = require('path');
@@ -12,13 +12,13 @@ import {Utility} from '../../lib/Utility';
 export default class GenerateCommand extends BaseCommand {
   static description = 'Generate a new command worker';
 
-  static args = [
-    {name: 'name', description: 'Command name'},
-  ];
+  static args = {
+    name: Args.string({description: 'Command name'}),
+  };
 
   static flags = {
     ...BaseCommand.flags,
-    'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
+    'config-template': Flags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
   protected requiredConfigFields(): ConfigFieldRequirement[] {
@@ -31,7 +31,7 @@ export default class GenerateCommand extends BaseCommand {
   }
 
   async run() {
-    const {args, flags} = this.parse(GenerateCommand);
+    const {args, flags} = await this.parse(GenerateCommand);
     await this.loadConfig();
 
     let name: string | undefined = args.name as string | undefined;
