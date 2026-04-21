@@ -5,6 +5,7 @@ import path = require('path');
 
 import {BaseCommand} from '../../Base';
 import {CodeInserter} from '../../lib/ast/CodeInserter';
+import {ConfigTemplateInserter} from '../../lib/ConfigTemplateInserter';
 import {type ScriptFileNode} from '../../lib/fs/ScriptFileNode';
 import {Utility} from '../../lib/Utility';
 
@@ -39,6 +40,7 @@ export default class GenerateService extends BaseCommand {
     listeners: oclifFlags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
     standalone: oclifFlags.boolean({description: 'Generate as SingletonService'}),
     'dry-run': oclifFlags.boolean({description: 'Show what would be generated without writing'}),
+    'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
   async run() {
@@ -140,6 +142,22 @@ export default class GenerateService extends BaseCommand {
 
     if (!flags['dry-run']) {
       await this.fileTree.commit();
+
+      let configTemplate = flags['config-template'];
+      if (!configTemplate) {
+        const answers = await inquirer.prompt<{configTemplate: string}>([
+          {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
+        ]);
+        configTemplate = answers.configTemplate;
+      }
+      const configTemplatePath = path.resolve(process.cwd(), configTemplate);
+      await ConfigTemplateInserter.insertConfig(
+        configTemplatePath,
+        'services',
+        Utility.dashlize(upperCamelCaseServiceName),
+        listeners,
+        (msg) => this.log(msg),
+      );
     } else {
       this.log('Dry run - no files written');
     }
