@@ -165,16 +165,12 @@ class TypeResolver {
     ts.forEachChild(node, visit);
   }
 
-  private resolveTypeReference(node: ts.TypeReferenceNode, checker: ts.TypeChecker, _: ts.SourceFile) {
+  private resolveTypeReference(node: ts.TypeReferenceNode, checker: ts.TypeChecker, sourceFile: ts.SourceFile) {
     const typeName = node.typeName;
+    const typeNameText = ts.isIdentifier(typeName) ? typeName.escapedText : typeName.getText(sourceFile);
 
     const symbol = checker.getSymbolAtLocation(typeName);
     if (!symbol) {
-      if (this.diagnostics_) {
-        this.diagnostics_.addWarning(
-          `Cannot resolve type '${typeName.getText()}'. The type symbol was not found.`
-        );
-      }
       return;
     }
 
@@ -184,7 +180,7 @@ class TypeResolver {
     if (!declarations || declarations.length === 0) {
       if (this.diagnostics_) {
         this.diagnostics_.addWarning(
-          `Cannot resolve declarations for type '${typeName.getText()}'.`
+          `Cannot resolve declarations for type '${typeNameText}'.`
         );
       }
       return;
@@ -385,7 +381,7 @@ class TypeResolver {
   private isBuiltInType(fileName: string): boolean {
     const builtInPaths = ['/typescript/lib/', '/@types/node/', 'node_modules'];
     const isBuiltIn = builtInPaths.some(p => fileName.includes(p));
-    if (isBuiltIn && this.diagnostics_ && fileName.includes('node_modules')) {
+    if (isBuiltIn && this.diagnostics_ && fileName.includes('node_modules') && !fileName.includes('/typescript/lib/')) {
       this.diagnostics_.addWarning(
         `External package type referenced from '${fileName}'. This type cannot be exported and will be skipped.`
       );

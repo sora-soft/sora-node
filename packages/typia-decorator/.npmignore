@@ -1,0 +1,10 @@
+.git/
+
+src/
+test/
+node_modules/
+.gitignore
+tsconfig.json
+eslint.config.mjs
+
+*.tgz
