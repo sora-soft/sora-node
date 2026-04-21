@@ -82,8 +82,8 @@ class AnnotationReader {
 
     if (ignoreTags.length === 0) return null;
 
-    const ignoreModes = AnnotationReader.readModes(tags);
-    return ignoreModes;
+    const comment = AnnotationReader.extractTagComment(ignoreTags[0]);
+    return comment.split(',').map(s => s.trim()).filter(s => s.length > 0);
   }
 
   static readModes(tags: readonly ts.JSDocTag[]): string[] {
