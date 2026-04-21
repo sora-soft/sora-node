@@ -39,7 +39,6 @@ export default class GenerateService extends BaseCommand {
     ...BaseCommand.flags,
     listeners: oclifFlags.string({description: 'Listener types (comma-separated: tcp,websocket,http,none)'}),
     standalone: oclifFlags.boolean({description: 'Generate as SingletonService'}),
-    'dry-run': oclifFlags.boolean({description: 'Show what would be generated without writing'}),
     'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
@@ -140,27 +139,23 @@ export default class GenerateService extends BaseCommand {
       this.generateHandler(handlerName, handlerFileExPath);
     }
 
-    if (!flags['dry-run']) {
-      await this.fileTree.commit();
+    await this.fileTree.commit();
 
-      let configTemplate = flags['config-template'];
-      if (!configTemplate) {
-        const answers = await inquirer.prompt<{configTemplate: string}>([
-          {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
-        ]);
-        configTemplate = answers.configTemplate;
-      }
-      const configTemplatePath = path.resolve(process.cwd(), configTemplate);
-      await ConfigTemplateInserter.insertConfig(
-        configTemplatePath,
-        'services',
-        Utility.dashlize(upperCamelCaseServiceName),
-        listeners,
-        (msg) => this.log(msg),
-      );
-    } else {
-      this.log('Dry run - no files written');
+    let configTemplate = flags['config-template'];
+    if (!configTemplate) {
+      const answers = await inquirer.prompt<{configTemplate: string}>([
+        {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
+      ]);
+      configTemplate = answers.configTemplate;
     }
+    const configTemplatePath = path.resolve(process.cwd(), configTemplate);
+    await ConfigTemplateInserter.insertConfig(
+      configTemplatePath,
+      'services',
+      Utility.dashlize(upperCamelCaseServiceName),
+      listeners,
+      (msg) => this.log(msg),
+    );
   }
 
   private generateHandler(handlerName: string, handlerFileExPath: string) {

@@ -19,7 +19,6 @@ export default class GenerateWorker extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     standalone: oclifFlags.boolean({description: 'Generate as SingletonWorker'}),
-    'dry-run': oclifFlags.boolean({description: 'Show what would be generated without writing'}),
     'config-template': oclifFlags.string({description: 'Config template file path (relative to cwd)'}),
   };
 
@@ -88,26 +87,22 @@ export default class GenerateWorker extends BaseCommand {
 
     this.log(`Worker ${upperCamelCaseWorkerFullName} generated`);
 
-    if (!flags['dry-run']) {
-      await this.fileTree.commit();
+    await this.fileTree.commit();
 
-      let configTemplate = flags['config-template'];
-      if (!configTemplate) {
-        const answers = await inquirer.prompt<{configTemplate: string}>([
-          {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
-        ]);
-        configTemplate = answers.configTemplate;
-      }
-      const configTemplatePath = path.resolve(process.cwd(), configTemplate);
-      await ConfigTemplateInserter.insertConfig(
-        configTemplatePath,
-        'workers',
-        Utility.dashlize(upperCamelCaseWorkerName),
-        [],
-        (msg) => this.log(msg),
-      );
-    } else {
-      this.log('Dry run - no files written');
+    let configTemplate = flags['config-template'];
+    if (!configTemplate) {
+      const answers = await inquirer.prompt<{configTemplate: string}>([
+        {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
+      ]);
+      configTemplate = answers.configTemplate;
     }
+    const configTemplatePath = path.resolve(process.cwd(), configTemplate);
+    await ConfigTemplateInserter.insertConfig(
+      configTemplatePath,
+      'workers',
+      Utility.dashlize(upperCamelCaseWorkerName),
+      [],
+      (msg) => this.log(msg),
+    );
   }
 }
