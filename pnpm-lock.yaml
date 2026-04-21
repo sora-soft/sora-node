@@ -166,6 +166,91 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/template-http-server:
+    dependencies:
+      '@sora-soft/framework':
+        specifier: workspace:*
+        version: link:../../packages/framework
+      '@sora-soft/http-support':
+        specifier: workspace:*
+        version: link:../../packages/http-support
+      '@sora-soft/ram-discovery':
+        specifier: workspace:*
+        version: link:../../packages/ram-discovery
+      '@sora-soft/typia-decorator':
+        specifier: workspace:*
+        version: link:../../packages/typia-decorator
+      axios:
+        specifier: ^1.4.0
+        version: 1.15.0
+      commander:
+        specifier: ^7.2.0
+        version: 7.2.0
+      js-yaml:
+        specifier: ^4.0.0
+        version: 4.1.1
+      mkdirp:
+        specifier: ^2.1.5
+        version: 2.1.6
+      moment:
+        specifier: ^2.29.1
+        version: 2.30.1
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      source-map-support:
+        specifier: ^0.5.19
+        version: 0.5.21
+      typia:
+        specifier: ^12.0.2
+        version: 12.0.2(@types/node@24.12.2)(typescript@5.9.3)
+    devDependencies:
+      '@sora-soft/cli':
+        specifier: workspace:*
+        version: link:../../packages/sora-cli
+      '@stylistic/eslint-plugin':
+        specifier: ^5.10.0
+        version: 5.10.0(eslint@9.39.4)
+      '@stylistic/eslint-plugin-ts':
+        specifier: ^4.4.1
+        version: 4.4.1(eslint@9.39.4)(typescript@5.9.3)
+      '@types/js-yaml':
+        specifier: ^4.0.0
+        version: 4.0.9
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      '@types/source-map-support':
+        specifier: ^0.5.3
+        version: 0.5.10
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.58.0
+        version: 8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.58.0
+        version: 8.58.2(eslint@9.39.4)(typescript@5.9.3)
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4
+      eslint-plugin-simple-import-sort:
+        specifier: ^13.0.0
+        version: 13.0.0(eslint@9.39.4)
+      eslint-plugin-unused-imports:
+        specifier: ^4.4.1
+        version: 4.4.1(@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)
+      globals:
+        specifier: ^17.5.0
+        version: 17.5.0
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      ts-patch:
+        specifier: ^3.3.0
+        version: 3.3.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/database-component:
     dependencies:
       '@sora-soft/framework':

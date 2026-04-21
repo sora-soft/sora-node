@@ -1,0 +1,25 @@
+#define(projectScope,string,project scope?)
+#define(host,host-ip,host ip?)
+#define(exposeHost,host-ip,port expose ip?)
+#define(port,number,listen port?)
+#define(alias,string,alias name?)
+
+debug: true
+discovery:
+  scope: $(projectScope)
+
+logger:
+  file:
+    fileFormat: '[./logs/server-]YYYY-MM-DD[.log]'
+
+node:
+  alias: $(alias)
+
+services:
+  http:
+    httpListener:
+      port: $(port)
+      host: $(host)
+      exposeHost: $(exposeHost)
+
+workers: {}

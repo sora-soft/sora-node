@@ -1,0 +1,15 @@
+#define(projectScope,string,project scope?)
+#define(alias,string,alias name?)
+
+debug: true
+discovery:
+  scope: $(projectScope)
+
+logger:
+  file:
+    fileFormat: '[./logs/server-]YYYY-MM-DD[.log]'
+
+node:
+  alias: $(alias)
+
+workers: {}

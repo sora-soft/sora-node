@@ -9,6 +9,7 @@ import libnpmconfig = require('libnpmconfig');
 
 const templates = [
   {pkg: '@sora-soft/example-template', desc: 'Sora backend example project'},
+  {pkg: '@sora-soft/http-server-template', desc: 'Sora minimal HTTP server template'},
 ];
 
 export default class NewProject extends Command {

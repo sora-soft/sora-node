@@ -1,5 +1,5 @@
 {
-  "name": "@sora-soft/sora-cli",
+  "name": "@sora-soft/cli",
   "version": "2.0.0",
   "description": "sora system cli tool",
   "bin": {
