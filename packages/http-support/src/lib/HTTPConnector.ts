@@ -50,8 +50,6 @@ class HTTPConnector extends Connector {
       this.ctxPromise_ = new Promise<void>((resolve) => {
         this.endCallback_ = resolve;
       });
-
-      this.handleCtx(ctx).catch(() => {});
     }
 
     if (options) {
@@ -154,7 +152,11 @@ class HTTPConnector extends Connector {
     }
   }
 
-  private async handleCtx(ctx: KOAContext) {
+  async handleCtx() {
+    const ctx = this.ctx_;
+    if (!ctx)
+      return;
+
     if (ctx.method === 'OPTIONS') {
       ctx.response.status = 200;
       await this.endCtx();

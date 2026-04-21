@@ -58,6 +58,7 @@ class HTTPListener extends Listener {
 
       const connector = new HTTPConnector(ctx);
       this.newConnector(session, connector);
+      await connector.handleCtx();
 
       await connector.promise;
       await next();
