@@ -13,5 +13,11 @@
   "apiDeclarationOutput": "../dist-api/api",
   "docOutput": "../dist-api/doc",
   "migration": "app/database/migration",
-  "databaseDir": "app/database"
+  "databaseDir": "app/database",
+  "configTemplates": [
+    {
+      "type": "server",
+      "path": "run/config.template.yml"
+    }
+  ]
 }

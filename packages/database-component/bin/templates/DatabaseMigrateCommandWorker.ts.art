@@ -1,0 +1,229 @@
+import {type DatabaseComponent, type IDatabaseComponentOptions} from '@sora-soft/database-component';
+import {DataSource} from '@sora-soft/database-component/typeorm';
+import {type IWorkerOptions, Node, Runtime, Worker} from '@sora-soft/framework';
+import camelcase from 'camelcase';
+import fs from 'fs/promises';
+import {mkdirp} from 'mkdirp';
+import moment from 'moment';
+import path from 'path';
+import typia from 'typia';
+import {fileURLToPath} from 'url';
+
+import {type ComponentName} from '<%- comImportPath %>';
+import {<%- workerNameEnum %>} from '<%- workerNameImportPath %>';
+
+const fileName = fileURLToPath(import.meta.url);
+const dirname = path.dirname(fileName);
+
+interface ISoraConfig {
+  root: string;
+  dist: string;
+  migration: string;
+}
+
+const soraConfig = JSON.parse(
+  await fs.readFile(path.resolve(dirname, '../../../sora.json'), {encoding: 'utf-8'})
+) as ISoraConfig;
+
+export interface IDatabaseMigrateCommandWorkerOptions extends IWorkerOptions {
+  components: ComponentName[];
+}
+
+class DatabaseMigrateCommandWorker extends Worker {
+  static register() {
+    Node.registerWorker(<%- workerNameEnum %>.DatabaseMigrateCommand, (options: IDatabaseMigrateCommandWorkerOptions) => {
+      return new DatabaseMigrateCommandWorker(<%- workerNameEnum %>.DatabaseMigrateCommand, options);
+    });
+  }
+
+  constructor(name: string, options: IDatabaseMigrateCommandWorkerOptions) {
+    typia.assert<IDatabaseMigrateCommandWorkerOptions>(options);
+    super(name, options);
+  }
+
+  protected async startup() {}
+
+  protected async shutdown() {}
+
+  async runCommand(commands: string[]) {
+    const [action] = commands;
+
+    switch (action) {
+      case 'generate': {
+        const projectPath = path.resolve(dirname, '../../../');
+        const migrationPath = soraConfig.migration;
+        for (const name of this.options_.components) {
+          const component: DatabaseComponent = Runtime.getComponent(name);
+          if (!component)
+            throw new Error(`ERR_COMPONENT_NOT_FOUND, name=${name}`);
+
+          const options = component.options as IDatabaseComponentOptions;
+
+          Runtime.frameLogger.info('worker.generate-migrate', {component: name});
+
+          const dataSource = new DataSource({
+            ...options.database,
+            entities: component.entities,
+          });
+
+          await dataSource.initialize();
+
+          const sqlInMemory = await dataSource.driver.createSchemaBuilder().log();
+          const upSqls: string[] = [];
+          const downSqls: string[] = [];
+
+          sqlInMemory.upQueries.forEach(query => {
+            upSqls.push('    await queryRunner.query(\'' + query.query.replace(new RegExp('\'', 'g'), '\\\'') + '\');');
+          });
+          sqlInMemory.downQueries.forEach(query => {
+            downSqls.push('    await queryRunner.query(\'' + query.query.replace(new RegExp('\'', 'g'), '\\\'') + '\');');
+          });
+
+          if (upSqls.length || downSqls.length) {
+            const className = `${camelcase(name, {pascalCase: true})}${Date.now()}`;
+            const file =
+              `import {MigrationInterface, QueryRunner} from '@sora-soft/database-component/typeorm';
+
+export class ${className} implements MigrationInterface {
+  async up(queryRunner: QueryRunner): Promise<void> {
+${upSqls.join('\n')}
+  }
+
+  async down(queryRunner: QueryRunner): Promise<void> {
+${downSqls.reverse().join('\n')}
+  }
+}
+`;
+            await mkdirp(path.resolve(projectPath, soraConfig.root, migrationPath, name));
+            await fs.writeFile(path.resolve(projectPath, soraConfig.root, migrationPath, name, moment().format('YYYYMMDD') + className + '.ts'), file);
+          }
+
+          await dataSource.destroy();
+        }
+
+        break;
+      }
+      case 'sync': {
+        for (const name of this.options_.components) {
+          const component: DatabaseComponent = Runtime.getComponent(name);
+          const options = component.options as IDatabaseComponentOptions;
+
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'sync-database', component: name});
+          const dataSource = new DataSource({
+            ...options.database,
+            entities: component.entities,
+            synchronize: true,
+          });
+
+          await dataSource.initialize();
+
+          await dataSource.destroy();
+        }
+        break;
+      }
+      case 'migrate': {
+        const [_, componentName] = commands;
+        if (!componentName) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component name needed'});
+          return false;
+        }
+
+        const component: DatabaseComponent = Runtime.getComponent(componentName);
+        if (!component) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component not found'});
+          return false;
+        }
+
+        const options = component.options as IDatabaseComponentOptions;
+        const projectPath = path.resolve(dirname, '../../../');
+        const migrationPath = path.resolve(projectPath, soraConfig.dist, soraConfig.migration);
+
+        const files = await fs.readdir(path.join(migrationPath, componentName));
+        const migrationList = files.map((file) => path.join(migrationPath, componentName, file)).filter((file) => path.extname(file) === '.js');
+        const dataSource = new DataSource({
+          ...options.database,
+          entities: component.entities,
+          migrationsRun: false,
+          migrations: migrationList,
+        });
+
+        await dataSource.initialize();
+
+        await dataSource.runMigrations({
+          transaction: 'all',
+        });
+
+        await dataSource.destroy();
+        break;
+      }
+
+      case 'revert': {
+        const [_, componentName] = commands;
+        if (!componentName) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component name needed'});
+          return false;
+        }
+
+        const component: DatabaseComponent = Runtime.getComponent(componentName);
+        if (!component) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component not found'});
+          return false;
+        }
+
+        const options = component.options as IDatabaseComponentOptions;
+
+        const projectPath = path.resolve(dirname, '../../../');
+        const migrationPath = path.resolve(projectPath, soraConfig.dist, soraConfig.migration, componentName);
+
+        const dataSource = new DataSource({
+          ...options.database,
+          entities: component.entities,
+          migrationsRun: false,
+          migrations: [path.join(migrationPath, '*.js')],
+        });
+
+        await dataSource.initialize();
+
+        await dataSource.undoLastMigration({
+          transaction: 'all',
+        });
+
+        await dataSource.destroy();
+        break;
+      }
+
+      case 'drop': {
+        const [_, componentName] = commands;
+        if (!componentName) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component name needed'});
+          return false;
+        }
+
+        const component: DatabaseComponent = Runtime.getComponent(componentName);
+        if (!component) {
+          Runtime.frameLogger.info('worker.database-migrate', {event: 'err', message: 'Component not found'});
+          return false;
+        }
+
+        const options = component.options as IDatabaseComponentOptions;
+
+        const dataSource = new DataSource({
+          ...options.database,
+          entities: component.entities,
+        });
+
+        await dataSource.initialize();
+        await dataSource.dropDatabase();
+        await dataSource.destroy();
+        break;
+      }
+      default:
+        break;
+    }
+    return true;
+  }
+
+  declare protected options_: IDatabaseMigrateCommandWorkerOptions;
+}
+
+export {DatabaseMigrateCommandWorker};

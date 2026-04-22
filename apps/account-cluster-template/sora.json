@@ -13,5 +13,9 @@
   "comClass": "lib/Com#Com",
   "migration": "app/database/migration",
   "apiDeclarationOutput": "../dist-api/api",
-  "docOutput": "../dist-api/doc"
+  "docOutput": "../dist-api/doc",
+  "configTemplates": [
+    { "type": "server", "path": "run/config.template.yml" },
+    { "type": "command", "path": "run/config-command.template.yml" }
+  ]
 }

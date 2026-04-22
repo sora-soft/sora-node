@@ -43,7 +43,7 @@ The system MUST accept a `--config-template` CLI flag on `generate:service`, `ge
 - **Then** the system MUST prompt the user with default value `run/config.template.yml`
 
 ### Requirement:Duplicate detection
-Before inserting a new config entry, the system MUST parse the YAML content (excluding `#define` lines) using js-yaml and check whether the target key already exists under `services:` or `workers:`. If it exists, the system MUST output a warning and skip insertion without erroring.
+Before inserting a new config entry, the system MUST parse the YAML content (excluding `#define` lines) using js-yaml and check whether the target key already exists under the target section. If it exists, the system MUST output a warning and skip insertion without erroring. The `checkDuplicate` 方法 MUST 接受任意 section 名称（不限于 `services` 和 `workers`）。When using structured `content`（`Record<string, any>`），section 名称 MUST 从 content 的顶层 key 推导，entry key MUST 从 content[section] 的第一层 key 推导。
 
 #### Scenario:Service already exists in config
 - **When** `generate:service auth` is run but `services.auth` already exists in the config template
@@ -52,6 +52,10 @@ Before inserting a new config entry, the system MUST parse the YAML content (exc
 #### Scenario:Worker already exists in config
 - **When** `generate:worker email-sender` is run but `workers.email-sender` already exists in the config template
 - **Then** the system MUST log a warning message and MUST NOT modify the config template
+
+#### Scenario:Component already exists in config
+- **When** install script 提供 `content: {components: {database: {...}}}` 但 `components.database` 已存在于 config template
+- **Then** 系统 MUST 输出警告并跳过插入
 
 ### Requirement:Preserve original file format
 The config template insertion MUST use string matching and text splicing, NOT YAML round-trip serialization. The `#define` macro lines, blank lines, quoting style, and indentation of the original file MUST be preserved. Only the target insertion point MUST be modified.

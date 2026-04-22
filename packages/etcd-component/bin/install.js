@@ -30,15 +30,19 @@ export async function action(answers, ctx, helpers) {
 
   const varPrefix = componentName.replace(/-/g, '_');
   await helpers.appendToConfigTemplate({
-    section: 'components',
     defines: [
-      `#define(${varPrefix}_host,string,${componentName} host)`,
+      { name: `${varPrefix}_host`, type: 'string', hint: `${componentName} host` },
     ],
-    content: `${componentName}:
-    etcd:
-      hosts:
-      - \$(${varPrefix}_host)
-    ttl: 60
-    prefix: \$(projectScope)`,
+    content: {
+      components: {
+        [componentName]: {
+          etcd: {
+            hosts: [`$(${varPrefix}_host)`],
+          },
+          ttl: 60,
+          prefix: '$(projectScope)',
+        },
+      },
+    },
   });
 }

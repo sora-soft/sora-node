@@ -55,6 +55,7 @@ export default class AddComponent extends BaseCommand {
       soraConfig: this.soraConfig.sora,
       packageVersion,
       packageName,
+      packageDir: packageRoot,
     };
 
     await this.checkDuplicateInstall(packageName);

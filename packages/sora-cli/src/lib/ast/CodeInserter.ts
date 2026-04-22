@@ -28,10 +28,12 @@ class CodeInserter {
       lastEnd = afterLastMember.includes(',');
     }
 
+    const prefix = enumDeclaration.members.length > 0 ? (lastEnd ? '' : ',') : '';
+    const suffix = enumDeclaration.members.length > 0 ? '' : '\n';
     this.file_.modify({
       start: enumDeclaration.members.end,
       end: enumDeclaration.members.end,
-      content: `${lastEnd ? '' : ','}\n  ${this.printer_.printNode(ts.EmitHint.Unspecified, newMember, sourceFile)},`,
+      content: `${prefix}\n  ${this.printer_.printNode(ts.EmitHint.Unspecified, newMember, sourceFile)},${suffix}`,
     });
   }
 
@@ -69,7 +71,7 @@ class CodeInserter {
       this.file_.modify({
         start: 0,
         end: 0,
-        content: importCode,
+        content: `${importCode}\n`,
       });
     } else {
       this.file_.modify({
@@ -104,7 +106,7 @@ class CodeInserter {
         this.file_.modify({
           start: openBrace.end,
           end: openBrace.end,
-          content: fieldCode,
+          content: `${fieldCode}\n`,
         });
       }
     }
@@ -121,10 +123,13 @@ class CodeInserter {
         if ((methodDeclaration.name as ts.Identifier).escapedText === method) {
           const body = methodDeclaration.body as ts.Block;
 
+          const isEmpty = body.statements.length === 0;
+          const insertCode = isEmpty ? `${code}\n  ` : code;
+
           this.file_.modify({
             start: body.statements.end,
             end: body.statements.end,
-            content: code,
+            content: insertCode,
           });
           return;
         }

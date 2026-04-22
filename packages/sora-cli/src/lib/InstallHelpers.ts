@@ -1,6 +1,7 @@
 import path = require('path');
 import {promises as fsp} from 'fs';
 import fs = require('fs');
+import template = require('art-template');
 
 import {CodeInserter} from './ast/CodeInserter';
 import {type ComponentInfo, type ConfigTemplateEntry} from './ComponentInstallerTypes';
@@ -9,6 +10,7 @@ import {ConfigTemplateInserter} from './ConfigTemplateInserter';
 import {type FileTree} from './fs/FileTree';
 import {type ScriptFileNode} from './fs/ScriptFileNode';
 import {Utility} from './Utility';
+import inquirer = require('inquirer');
 
 class InstallHelpersImpl {
   constructor(
@@ -132,6 +134,165 @@ class InstallHelpersImpl {
     this.warnFn_(message);
   }
 
+  async addWorkerToProject(options: {
+    templatePath: string;
+    templateData: Record<string, any>;
+    workerNameKey: string;
+    workerNameValue: string;
+    workerClassName: string;
+  }): Promise<void> {
+    const [workerNameFilePath, workerNameEnum] = this.soraConfig_.sora.workerNameEnum.split('#');
+    const [workerRegisterFilePath, registerMethodPath] = this.soraConfig_.sora.workerRegister.split('#');
+    const [workerRegisterClass, workerRegisterMethod] = registerMethodPath.split('.');
+
+    const workerDir = this.soraConfig_.sora.workerDir;
+    const workerFileExPath = path.join(workerDir, `${options.workerClassName}.ts`);
+    const workerFilePath = path.join(workerDir, options.workerClassName);
+
+    const existedFile = this.fileTree_.getFile(workerFileExPath);
+    if (existedFile) {
+      throw new Error(`Worker file already exists: '${workerFileExPath}'`);
+    }
+
+    const result = template(options.templatePath, options.templateData);
+    const workerFile = this.fileTree_.newFile(workerFileExPath) as ScriptFileNode;
+    workerFile.setContent(Buffer.from(result));
+
+    const workerNameFileExtPath = workerNameFilePath + '.ts';
+    const workerNameFile = this.fileTree_.getFile(workerNameFileExtPath);
+    if (!workerNameFile) {
+      throw new Error(`File referenced by 'workerNameEnum' not found: '${workerNameFileExtPath}'. Check the path in your sora.json.`);
+    }
+    await (workerNameFile as ScriptFileNode).load();
+    new CodeInserter(workerNameFile as ScriptFileNode).insertEnum(workerNameEnum, options.workerNameKey, options.workerNameValue);
+
+    const workerRegisterFileExtPath = workerRegisterFilePath + '.ts';
+    const workerRegisterFile = this.fileTree_.getFile(workerRegisterFileExtPath);
+    if (!workerRegisterFile) {
+      throw new Error(`File referenced by 'workerRegister' not found: '${workerRegisterFileExtPath}'. Check the path in your sora.json.`);
+    }
+    const workerRegisterRelativePath = Utility.resolveImportPath(workerRegisterFilePath, workerFilePath) + '.js';
+    await (workerRegisterFile as ScriptFileNode).load();
+    const workerRegisterAST = new CodeInserter(workerRegisterFile as ScriptFileNode);
+    workerRegisterAST.addImport(options.workerClassName, workerRegisterRelativePath, false);
+    workerRegisterAST.insertCodeInClassMethod(workerRegisterClass, workerRegisterMethod, `\n    ${options.workerClassName}.register();`);
+
+    this.logFn_(`Worker ${options.workerClassName} added to project`);
+  }
+
+  async mergePackageScripts(scripts: Record<string, string>): Promise<void> {
+    const relativePath = path.relative(this.fileTree_.rootPath, path.resolve(path.dirname(this.fileTree_.rootPath), 'package.json')).replace(/\\/g, '/');
+    const pkg = await this.readPackageJson(relativePath);
+
+    if (!pkg.scripts) {
+      pkg.scripts = {};
+    }
+
+    for (const [key, value] of Object.entries(scripts)) {
+      if (key in pkg.scripts) {
+        if (pkg.scripts[key] === value) {
+          continue;
+        }
+        this.warnFn_(`Script '${key}' already exists in package.json with different value, keeping existing`);
+        continue;
+      }
+      pkg.scripts[key] = value;
+    }
+
+    this.writePackageJson(relativePath, pkg);
+    this.logFn_(`Merged scripts into package.json`);
+  }
+
+  async mergePackageDependencies(deps: { dependencies?: Record<string, string> }): Promise<void> {
+    const relativePath = path.relative(this.fileTree_.rootPath, path.resolve(path.dirname(this.fileTree_.rootPath), 'package.json')).replace(/\\/g, '/');
+    const pkg = await this.readPackageJson(relativePath);
+
+    if (!pkg.dependencies) {
+      pkg.dependencies = {};
+    }
+
+    const devDeps = new Set(Object.keys(pkg.devDependencies || {}));
+    const existingDeps = new Set(Object.keys(pkg.dependencies));
+
+    if (deps.dependencies) {
+      for (const [key, value] of Object.entries(deps.dependencies)) {
+        if (existingDeps.has(key) || devDeps.has(key)) {
+          continue;
+        }
+        pkg.dependencies[key] = value;
+      }
+    }
+
+    this.writePackageJson(relativePath, pkg);
+    this.logFn_(`Merged dependencies into package.json`);
+  }
+
+  private async readPackageJson(relativePath: string): Promise<Record<string, any>> {
+    const existing = this.fileTree_.getFile(relativePath);
+    if (existing) {
+      const content = (existing as ScriptFileNode).getContent() as string;
+      return JSON.parse(content);
+    }
+
+    const absolutePath = path.resolve(this.fileTree_.rootPath, relativePath);
+    try {
+      const content = await fsp.readFile(absolutePath, 'utf-8');
+      return JSON.parse(content);
+    } catch {
+      this.warnFn_('package.json not found');
+      return {};
+    }
+  }
+
+  private writePackageJson(relativePath: string, pkg: Record<string, any>): void {
+    const existing = this.fileTree_.getFile(relativePath);
+    if (existing) {
+      (existing as ScriptFileNode).setContent(Buffer.from(JSON.stringify(pkg, null, 2) + '\n'));
+    } else {
+      const file = this.fileTree_.newFile(relativePath) as ScriptFileNode;
+      file.setContent(Buffer.from(JSON.stringify(pkg, null, 2) + '\n'));
+    }
+  }
+
+  async appendToCommandConfigTemplate(entry: ConfigTemplateEntry, createIfMissing = false): Promise<void> {
+    const projectRoot = path.dirname(this.fileTree_.rootPath);
+    const commandTemplate = this.getConfigTemplatePath('command');
+    const templateRelPath = commandTemplate || 'run/config-command.template.yml';
+    const templatePath = path.resolve(projectRoot, templateRelPath);
+
+    if (!fs.existsSync(templatePath)) {
+      if (!createIfMissing) {
+        const answers = await inquirer.prompt<{create: boolean}>([
+          {name: 'create', message: `Command config template '${templateRelPath}' not found. Create it?`, type: 'confirm', default: true},
+        ]);
+        if (!answers.create) {
+          this.warnFn_(`Skipped command config template creation`);
+          return;
+        }
+      }
+
+      await fsp.mkdir(path.dirname(templatePath), {recursive: true});
+
+      const defineStrings = entry.defines.map(d => ConfigTemplateInserter.buildDefineString(d));
+      const definesBlock = defineStrings.join('\n');
+      const yamlBlock = ConfigTemplateInserter.serializeContentToYaml(entry.content);
+      const initialContent = definesBlock ? `${definesBlock}\n\n${yamlBlock}\n` : `${yamlBlock}\n`;
+
+      const relativePath = path.relative(this.fileTree_.rootPath, templatePath).replace(/\\/g, '/');
+      const file = this.fileTree_.newFile(relativePath) as ScriptFileNode;
+      file.setContent(Buffer.from(initialContent));
+
+      this.logFn_(`Created command config template: ${templateRelPath}`);
+      return;
+    }
+
+    await ConfigTemplateInserter.appendToConfigTemplateEntry(
+      templatePath,
+      entry,
+      this.logFn_
+    );
+  }
+
   private deepMerge(target: Record<string, any>, source: Record<string, any>, filePath: string): Record<string, any> {
     const result = {...target};
     for (const [key, value] of Object.entries(source)) {
@@ -153,6 +314,18 @@ class InstallHelpersImpl {
 
   private findConfigTemplate(): string | null {
     const projectRoot = path.dirname(this.fileTree_.rootPath);
+
+    const configured = this.getConfigTemplatePath('server');
+    if (configured) {
+      const resolved = path.resolve(projectRoot, configured);
+      try {
+        fs.accessSync(resolved);
+        return resolved;
+      } catch {
+        // Fall through to defaults
+      }
+    }
+
     const candidates = [
       path.join(projectRoot, 'run', 'config.template.yml'),
       path.join(projectRoot, 'run', 'config.template.yaml'),
@@ -166,6 +339,13 @@ class InstallHelpersImpl {
       }
     }
     return null;
+  }
+
+  private getConfigTemplatePath(type: string): string | undefined {
+    const templates: Array<{type: string; path: string}> | undefined = (this.soraConfig_.sora as any).configTemplates;
+    if (!templates || !Array.isArray(templates)) return undefined;
+    const entry = templates.find(t => t.type === type);
+    return entry?.path;
   }
 
   private fileTree_: FileTree;

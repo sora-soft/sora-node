@@ -4,6 +4,7 @@ interface ComponentInstallContext {
   soraConfig: Record<string, any>;
   packageVersion: string;
   packageName: string;
+  packageDir: string;
 }
 
 interface InstallQuestion {
@@ -24,10 +25,16 @@ interface ComponentInfo {
   registerCall: string;
 }
 
+interface DefineField {
+  name: string;
+  type: 'string' | 'number' | 'password' | 'host-ip' | 'select';
+  hint: string;
+  choices?: string[];
+}
+
 interface ConfigTemplateEntry {
-  section: string;
-  defines: string[];
-  content: string;
+  defines: DefineField[];
+  content: Record<string, any>;
 }
 
 interface InstallHelpers {
@@ -37,6 +44,16 @@ interface InstallHelpers {
   copyFile(from: string, to: string): Promise<void>;
   writeFile(filePath: string, content: string | Buffer): Promise<void>;
   ensureDir(dirPath: string): Promise<void>;
+  addWorkerToProject(options: {
+    templatePath: string;
+    templateData: Record<string, any>;
+    workerNameKey: string;
+    workerNameValue: string;
+    workerClassName: string;
+  }): Promise<void>;
+  mergePackageScripts(scripts: Record<string, string>): Promise<void>;
+  mergePackageDependencies(deps: { dependencies?: Record<string, string> }): Promise<void>;
+  appendToCommandConfigTemplate(entry: ConfigTemplateEntry, createIfMissing?: boolean): Promise<void>;
   camelize(str: string, upper?: boolean): string;
   dashlize(str: string): string;
   log(message: string): void;
@@ -61,6 +78,7 @@ export {
   ComponentInstallContext,
   ComponentInstallScript,
   ConfigTemplateEntry,
+  DefineField,
   InstallHelpers,
   InstallQuestion,
   SoraComponentManifest,

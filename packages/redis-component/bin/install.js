@@ -30,13 +30,17 @@ export async function action(answers, ctx, helpers) {
 
   const varPrefix = componentName.replace(/-/g, '_');
   await helpers.appendToConfigTemplate({
-    section: 'components',
     defines: [
-      `#define(${varPrefix}_url,string,${componentName} URL)`,
-      `#define(${varPrefix}_database,number,${componentName} database index)`,
+      { name: `${varPrefix}_url`, type: 'string', hint: `${componentName} URL` },
+      { name: `${varPrefix}_database`, type: 'number', hint: `${componentName} database index` },
     ],
-    content: `${componentName}:
-    url: \$(${varPrefix}_url)
-    database: \$(${varPrefix}_database)`,
+    content: {
+      components: {
+        [componentName]: {
+          url: `$(${varPrefix}_url)`,
+          database: `$(${varPrefix}_database)`,
+        },
+      },
+    },
   });
 }

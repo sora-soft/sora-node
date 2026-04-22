@@ -17,6 +17,11 @@ interface ISoraConfig {
   comClass: string;
   apiDeclarationOutput: string;
   docOutput?: string;
+  migration?: string;
+  configTemplates?: Array<{
+    type: string;
+    path: string;
+  }>;
 }
 
 class Config {

@@ -2,6 +2,7 @@ import {Flags} from '@oclif/core';
 import template = require('art-template');
 import path = require('path');
 import fs = require('fs/promises');
+import fsSync = require('fs');
 import inquirer = require('inquirer');
 import os = require('os');
 
@@ -12,8 +13,9 @@ export default class ConfigCommand extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    template: Flags.string({char: 't', description: 'Template config file', required: true}),
-    dist: Flags.string({char: 'd', description: 'Output file', required: true}),
+    template: Flags.string({char: 't', description: 'Template config file'}),
+    dist: Flags.string({char: 'd', description: 'Output file'}),
+    all: Flags.boolean({description: 'Generate all config files from sora.json configTemplates'}),
   };
 
   protected requiredConfigFields() {
@@ -23,10 +25,45 @@ export default class ConfigCommand extends BaseCommand {
   async run() {
     const {flags} = await this.parse(ConfigCommand);
 
+    if (flags.all) {
+      await this.loadConfig();
+      await this.runAll();
+      return;
+    }
+
+    if (!flags.template || !flags.dist) {
+      this.error('Both --template (-t) and --dist (-d) are required when not using --all');
+    }
+
     await generateConfigFile({
       template: flags.template,
       dist: flags.dist,
     });
+  }
+
+  private async runAll() {
+    const configTemplates: Array<{type: string; path: string}> | undefined = (this.soraConfig?.sora as any)?.configTemplates;
+    if (!configTemplates || !Array.isArray(configTemplates) || configTemplates.length === 0) {
+      this.error('No configTemplates found in sora.json. Add a configTemplates array with {type, path} entries.');
+    }
+
+    for (const entry of configTemplates) {
+      if (!entry.path || typeof entry.path !== 'string') continue;
+
+      const templatePath = path.resolve(process.cwd(), entry.path);
+      if (!fsSync.existsSync(templatePath)) {
+        this.warn(`Template file not found for '${entry.type}': ${entry.path}, skipping`);
+        continue;
+      }
+
+      const distPath = entry.path.replace('.template.', '.');
+
+      this.log(`Generating ${entry.type} config: ${entry.path} -> ${distPath}`);
+      await generateConfigFile({
+        template: templatePath,
+        dist: path.resolve(process.cwd(), distPath),
+      });
+    }
   }
 }
 

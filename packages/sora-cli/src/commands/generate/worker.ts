@@ -106,8 +106,9 @@ export default class GenerateWorker extends BaseCommand {
 
     let configTemplate = flags['config-template'];
     if (!configTemplate) {
+      const defaultTemplate = ((this.soraConfig.sora as any).configTemplates as Array<{type: string; path: string}> | undefined)?.find(t => t.type === 'server')?.path ?? 'run/config.template.yml';
       const answers = await inquirer.prompt<{configTemplate: string}>([
-        {name: 'configTemplate', message: 'Config template file?', default: 'run/config.template.yml'},
+        {name: 'configTemplate', message: 'Config template file?', default: defaultTemplate},
       ]);
       configTemplate = answers.configTemplate;
     }
