@@ -2,7 +2,6 @@
 #define(host,host-ip,host ip?)
 #define(exposeHost,host-ip,port expose ip?)
 #define(port,number,listen port?)
-#define(alias,string,alias name?)
 
 debug: true
 discovery:
@@ -12,8 +11,7 @@ logger:
   file:
     fileFormat: '[./logs/server-]YYYY-MM-DD[.log]'
 
-node:
-  alias: $(alias)
+node: {}
 
 services:
   http:
