@@ -82,8 +82,7 @@ export interface ITestRes {
 
 /**
  * @soraExport route
- * @soraTargets web
- * @soraPrefix /api/v1/auth
+ * @soraPrefix /auth
  */
 class AuthHandler extends AuthRoute {
   /**

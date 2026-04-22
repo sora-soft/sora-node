@@ -1,0 +1,15 @@
+{
+  "root": "src",
+  "dist": "dist",
+  "serviceDir": "app/service",
+  "serviceNameEnum": "app/service/common/ServiceName#ServiceName",
+  "serviceRegister": "app/service/common/ServiceRegister#ServiceRegister.init",
+  "handlerDir": "app/handler",
+  "workerDir": "app/worker",
+  "workerNameEnum": "app/worker/common/WorkerName#WorkerName",
+  "workerRegister": "app/worker/common/WorkerRegister#WorkerRegister.init",
+  "componentNameEnum": "lib/Com#ComponentName",
+  "comClass": "lib/Com#Com",
+  "apiDeclarationOutput": "../dist-api/api",
+  "docOutput": "../dist-api/doc"
+}

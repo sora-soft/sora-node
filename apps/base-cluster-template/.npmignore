@@ -1,0 +1,12 @@
+.git/
+
+test/
+node_modules/
+dist/
+dist-api/
+
+*.tgz
+
+run/config.yml
+run/.var.json
+run/logs/

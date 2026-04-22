@@ -35,12 +35,12 @@
 - **那么** 系统解析 name="my-app"，template="@sora-soft/example-template@^1.0.0"，跳过模板选择
 
 ### 需求:TEMPLATES 常量包含可用模板列表
-`sora new` 命令的 TEMPLATES 常量必须在现有 `@sora-soft/example-template` 基础上新增 `@sora-soft/http-server-template` 条目，描述为极简 HTTP 服务模板。
+`sora new` 命令的 TEMPLATES 常量必须包含所有内置模板条目，按复杂度递增排列：`@sora-soft/http-server-template`（单进程简单 HTTP 服务器）、`@sora-soft/base-cluster-template`（带网关与业务服务的通用集群模板）、`@sora-soft/account-cluster-template`（带完整网关与账号登录功能的集群模板项目）。
 
 #### 场景:用户交互选择模板
 - **当** 用户运行 `sora new my-project` 未指定 template 参数
-- **那么** 交互列表中显示 `@sora-soft/http-server-template - Sora minimal HTTP server template` 选项
+- **那么** 交互列表按复杂度递增显示所有内置模板选项，包括 http-server-template、base-cluster-template、account-cluster-template
 
 #### 场景:用户直接指定模板
-- **当** 用户运行 `sora new my-project @sora-soft/http-server-template`
+- **当** 用户运行 `sora new my-project @sora-soft/base-cluster-template`
 - **那么** 直接下载该模板包，不进入交互选择

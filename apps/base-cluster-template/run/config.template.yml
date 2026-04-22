@@ -1,0 +1,45 @@
+#define(projectScope,string,project scope?)
+#define(host,host-ip,host ip?)
+#define(httpPort,number,http port?)
+#define(exposeHost,host-ip,port expose ip?)
+#define(portRangeMin,number,min avaliable port?)
+#define(portRangeMax,number,max avaliable port?)
+#define(etcdHost,string,etcd host?)
+#define(alias,string,alias name?)
+
+debug: true
+discovery:
+  etcdComponentName: 'etcd'
+  scope: $(projectScope)
+
+logger:
+  file:
+    fileFormat: '[./logs/server-]YYYY-MM-DD[.log]'
+
+node:
+  alias: $(alias)
+
+services:
+  http-gateway:
+    httpListener:
+      port: $(httpPort)
+      host: $(host)
+      exposeHost: $(exposeHost)
+
+  business:
+    tcpListener:
+      portRange:
+        - $(portRangeMin)
+        - $(portRangeMax)
+      host: $(host)
+      exposeHost: $(exposeHost)
+
+components:
+  etcd:
+    etcd:
+      hosts:
+      - $(etcdHost)
+    ttl: 60
+    prefix: $(projectScope)
+
+workers: {}

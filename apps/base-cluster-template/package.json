@@ -1,0 +1,60 @@
+{
+  "name": "@sora-soft/base-cluster-template",
+  "version": "1.0.0",
+  "description": "sora base cluster template",
+  "bin": {
+    "base-server": "./bin/cli.js"
+  },
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "rimraf ./dist && tspc",
+    "dev": "npm run build && node ./bin/cli.js run server --config ./config.yml -w ./run",
+    "start": "node ./bin/cli.js run server --config ./config.yml -w ./run",
+    "config": "sora config -t ./run/config.template.yml -d ./run/config.yml",
+    "lint": "eslint src/",
+    "prepare": "ts-patch install -s"
+  },
+  "repository": "git@github.com:sora-soft/sora-monorepo.git",
+  "keywords": [
+    "sora"
+  ],
+  "author": "yaya",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/sora-soft/sora-monorepo/issues"
+  },
+  "homepage": "https://github.com/sora-soft/sora-monorepo",
+  "dependencies": {
+    "@sora-soft/etcd-component": "workspace:*",
+    "@sora-soft/etcd-discovery": "workspace:*",
+    "@sora-soft/framework": "workspace:*",
+    "@sora-soft/http-support": "workspace:*",
+    "@sora-soft/typia-decorator": "workspace:*",
+    "axios": "^1.4.0",
+    "commander": "^7.2.0",
+    "js-yaml": "^4.0.0",
+    "mkdirp": "^2.1.5",
+    "moment": "^2.29.1",
+    "reflect-metadata": "^0.2.2",
+    "source-map-support": "^0.5.19",
+    "typia": "^12.0.2"
+  },
+  "devDependencies": {
+    "@sora-soft/cli": "workspace:*",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin-ts": "^4.4.1",
+    "@types/js-yaml": "^4.0.0",
+    "@types/node": "^24.0.0",
+    "@types/source-map-support": "^0.5.3",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "globals": "^17.5.0",
+    "rimraf": "^3.0.2",
+    "ts-patch": "^3.3.0",
+    "typescript": "^5.9.3"
+  }
+}

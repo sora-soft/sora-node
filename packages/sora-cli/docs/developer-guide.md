@@ -10,7 +10,7 @@
 src/
 ├── Base.ts                        命令基类，提供 loadConfig()、soraConfig、fileTree
 ├── commands/                      命令层（用户入口）
-│   ├── new.ts                     git clone + 重写 package.json
+│   ├── new.ts                     pacote 下载 npm 模板 + 重写 package.json
 │   ├── config.ts                  art-template + #define + inquirer
 │   ├── generate/
 │   │   ├── service.ts             生成 Service + Handler + AST 注册 + 配置注入
@@ -43,11 +43,12 @@ src/
 │       ├── DocTransformer.ts      路由方法 → OpenAPI PathItem
 │       ├── SchemaResolver.ts      TypeScript 类型 → JSON Schema
 │       └── OpenApiEmitter.ts      组装 OpenAPI 文档 + 写入文件
-└── template/                      art-template 模板文件
-    ├── service/Service.ts.art
-    ├── handler/Handler.ts.art
-    ├── worker/Worker.ts.art
-    └── command/CommandWorker.ts.art
+
+template/                          art-template 模板文件（包根目录）
+├── service/Service.ts.art
+├── handler/Handler.ts.art
+├── worker/Worker.ts.art
+└── command/CommandWorker.ts.art
 ```
 
 ---

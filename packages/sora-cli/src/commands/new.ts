@@ -8,7 +8,8 @@ import pacote = require('pacote');
 
 const templates = [
   {pkg: '@sora-soft/http-server-template', desc: '单进程简单 HTTP 服务器'},
-  {pkg: '@sora-soft/account-cluster-template', desc: '带完整网关与账号登录功能的模板项目'},
+  {pkg: '@sora-soft/base-cluster-template', desc: '带网关与业务服务的通用集群模板'},
+  {pkg: '@sora-soft/account-cluster-template', desc: '带完整网关与账号登录功能的集群模板项目'},
 ];
 
 export default class NewProject extends Command {

@@ -18,7 +18,7 @@ npm install -g @sora-soft/cli
 sora new my-app
 ```
 
-CLI 会依次询问项目名称、描述、版本、作者和许可证。确认后从模板仓库克隆项目并用你提供的信息重写 `package.json`。
+CLI 会先让你选择项目模板，然后依次询问项目名称、描述、版本、作者和许可证。确认后从 npm 下载模板并用你提供的信息重写 `package.json`。
 
 进入项目目录：
 
@@ -199,11 +199,23 @@ sora
 
 ### `sora new <name>`
 
-| 参数 | 说明 |
+| 参数 / Flag | 说明 |
 |---|---|
 | `<name>` | 项目名称 |
+| `[template]` | 模板 npm 包名（可选，跳过交互选择） |
+| `--registry <url>` | npm registry URL |
+| `--token <token>` | 私有仓库的 auth token |
 
-从模板仓库克隆并交互式配置项目信息（名称、描述、版本、作者、许可证）。不需要在已有项目中运行。
+从 npm 下载模板并交互式配置项目信息（名称、描述、版本、作者、许可证）。不需要在已有项目中运行。
+
+#### 可用模板
+
+| 模板包名 | 描述 |
+|---|---|
+| `@sora-soft/http-server-template` | 单进程简单 HTTP 服务器 |
+| `@sora-soft/account-cluster-template` | 带完整网关与账号登录功能的模板项目 |
+
+如果不在 `[template]` 参数中指定模板，CLI 会交互式列出可用模板供选择，也可以输入自定义包名。
 
 ### `sora generate:service [name]`
 
@@ -318,9 +330,9 @@ database:
 | `workerDir` | `string` | 是 | Worker 文件存放目录，相对于 `root` |
 | `workerNameEnum` | `string` | 是 | 工作器名枚举的符号引用 |
 | `workerRegister` | `string` | 是 | 工作器注册函数的符号引用 |
-| `databaseDir` | `string` | 是 | 数据库相关文件目录，相对于 `root` |
-| `componentNameEnum` | `string` | 是 | 组件名枚举的符号引用 |
-| `comClass` | `string` | 是 | Com 组件管理类的符号引用 |
+| `databaseDir` | `string` | 否 | 数据库相关文件目录，相对于 `root` |
+| `componentNameEnum` | `string` | 否 | 组件名枚举的符号引用 |
+| `comClass` | `string` | 否 | Com 组件管理类的符号引用 |
 | `migration` | `string` | 否 | 数据库迁移文件目录，相对于 `root` |
 | `apiDeclarationOutput` | `string` | 是 | API 类型声明输出路径 |
 | `docOutput` | `string` | 否 | OpenAPI 文档输出路径 |

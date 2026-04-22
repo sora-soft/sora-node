@@ -1,0 +1,4 @@
+/**
+ * @soraExport
+ */
+export enum WorkerName {}

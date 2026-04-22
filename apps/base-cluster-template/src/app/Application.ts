@@ -1,0 +1,188 @@
+import {ETCDDiscovery} from '@sora-soft/etcd-discovery';
+import {ConsoleOutput, ExError, type IComponentOptions, type INodeOptions, type IServiceOptions, type IWorkerOptions, Logger, LogLevel, Node, Runtime} from '@sora-soft/framework';
+import {readFile} from 'fs/promises';
+import typia from 'typia';
+
+import {Com} from '../lib/Com.js';
+import {FileOutput} from '../lib/FileLogger.js';
+import {Pvd} from '../lib/Provider.js';
+import {AppError} from './AppError.js';
+import {AppLogger} from './AppLogger.js';
+import {AppErrorCode} from './ErrorCode.js';
+import {ServiceRegister} from './service/common/ServiceRegister.js';
+import {WorkerRegister} from './worker/common/WorkerRegister.js';
+
+const pkg = JSON.parse(
+  await readFile(new URL('../../package.json', import.meta.url), {encoding: 'utf-8'})
+) as {version: string; name: string};
+
+export interface IApplicationLoggerOptions {
+  file: {
+    fileFormat: string;
+  };
+}
+
+export interface IApplicationOptions {
+  readonly debug: boolean;
+  readonly logger: IApplicationLoggerOptions;
+  readonly discovery: {
+    readonly etcdComponentName: string;
+    readonly scope: string;
+  };
+  readonly node: INodeOptions;
+  readonly services?: {
+    readonly [name: string]: IServiceOptions;
+  };
+  readonly workers?: {
+    readonly [name: string]: IWorkerOptions;
+  };
+  readonly components?: {
+    readonly [name: string]: IComponentOptions;
+  };
+}
+
+class Application {
+  static get appName(): string {
+    return pkg.name;
+  }
+
+  static get appLog() {
+    return this.appLog_;
+  }
+
+  private static appLog_: AppLogger;
+
+  static get config() {
+    return this.config_;
+  }
+
+  private static config_: IApplicationOptions;
+
+  static async startContainer(options: IApplicationOptions) {
+    await this.start(options);
+  }
+
+  static async startCommand(options: IApplicationOptions, name: string, args: string[]) {
+    await this.start(options);
+    if (!options.workers || !options.workers[name])
+      throw new AppError(AppErrorCode.ErrConfigNotFound, `ERR_CONFIG_NOT_FOUND, works[${name}]`);
+
+    const worker = Node.workerFactory(name, options.workers[name]);
+    if (!worker)
+      throw new AppError(AppErrorCode.ErrWorkerNotCreated, `ERR_WORKER_NOT_CREATED, worker=${name}`);
+    await Runtime.installWorker(worker);
+    const result = await worker.runCommand(args);
+    if (result) {
+      this.appLog.success('worker', 'Run command success');
+    }
+    await Runtime.shutdown();
+  }
+
+  static async startServer(options: IApplicationOptions) {
+    await this.start(options);
+
+    if (options.services) {
+      for (const [name, serviceConfig] of Object.entries(options.services)) {
+        const service = Node.serviceFactory(name, serviceConfig);
+        if (!service) {
+          const err = new AppError(AppErrorCode.ErrServiceNotCreated, `ERR_SERVICE_NOT_CREATED, service=${name}`);
+          this.appLog.error('application', err, {event: 'create-service-error', error: Logger.errorMessage(err)});
+          continue;
+        }
+        Runtime.installService(service).catch((err: ExError) => {
+          this.appLog.error('application', err, {event: 'install-service-error', error: Logger.errorMessage(err)});
+        });
+      }
+    }
+
+    if (options.workers) {
+      for (const [name, workerConfig] of Object.entries(options.workers)) {
+        const worker = Node.workerFactory(name, workerConfig);
+        if (!worker) {
+          const err = new AppError(AppErrorCode.ErrWorkerNotCreated, `ERR_WORKER_NOT_CREATED, worker=${name}`);
+          this.appLog.error('application', err, {event: 'create-worker-error', error: Logger.errorMessage(err)});
+          continue;
+        }
+        Runtime.installWorker(worker).catch((err: ExError) => {
+          this.appLog.error('application', err, {event: 'install-worker-error', error: Logger.errorMessage(err)});
+        });
+      }
+    }
+  }
+
+  static async startOnlyAppLog(debug: boolean, loggerConfig: IApplicationLoggerOptions) {
+    this.appLog_ = new AppLogger();
+
+    const logLevels = [LogLevel.Error, LogLevel.Fatal, LogLevel.Info, LogLevel.Success, LogLevel.Warn];
+    if (debug)
+      logLevels.push(LogLevel.Debug);
+
+    const consoleOutput = new ConsoleOutput({
+      levels: logLevels,
+    });
+    const fileOutput = new FileOutput({
+      levels: logLevels,
+      fileFormat: loggerConfig.file.fileFormat,
+    });
+
+    this.appLog_.pipe(consoleOutput);
+    this.appLog_.pipe(fileOutput);
+  }
+
+  static async startLog(debug: boolean, loggerConfig: IApplicationLoggerOptions) {
+    this.appLog_ = new AppLogger();
+
+    const logLevels = [LogLevel.Error, LogLevel.Fatal, LogLevel.Info, LogLevel.Success, LogLevel.Warn];
+    if (debug)
+      logLevels.push(LogLevel.Debug);
+
+    const consoleOutput = new ConsoleOutput({
+      levels: logLevels,
+    });
+    const fileOutput = new FileOutput({
+      levels: logLevels,
+      fileFormat: loggerConfig.file.fileFormat,
+    });
+
+    Runtime.frameLogger.pipe(consoleOutput).pipe(fileOutput);
+    Runtime.rpcLogger.pipe(consoleOutput).pipe(fileOutput);
+    this.appLog_.pipe(consoleOutput).pipe(fileOutput);
+  }
+
+  private static async start(options: IApplicationOptions) {
+    this.config_ = options;
+    Runtime.appVersion = pkg.version;
+    try {
+      typia.assert<IApplicationOptions>(options);
+    } catch(e) {
+      const err = ExError.fromError(e as Error);
+      throw new AppError(AppErrorCode.ErrLoadConfig, `ERR_LOAD_CONFIG, message=${err.message}`);
+    }
+
+    Com.register();
+    if (options.components) {
+      for (const [name, componentConfig] of Object.entries(options.components)) {
+        const component = Runtime.getComponent(name);
+        if (!component)
+          continue;
+
+        component.loadOptions(componentConfig);
+      }
+    }
+
+    await Runtime.loadConfig({scope: options.discovery.scope});
+    const discovery = new ETCDDiscovery({
+      etcdComponentName: options.discovery.etcdComponentName,
+      prefix: options.discovery.scope,
+    });
+    const node = new Node(options.node, []);
+    await Runtime.startup(node, discovery);
+    this.appLog_.success('application', {event: 'app-start', versions: {runtime: Runtime.version}, processId: process.pid});
+
+    ServiceRegister.init();
+    WorkerRegister.init();
+    Pvd.registerSenders();
+  }
+}
+
+export {Application};
