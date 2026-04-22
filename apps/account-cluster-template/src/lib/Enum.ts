@@ -1,7 +1,7 @@
 export enum ConfigFileType {
   JSON,
   YAML,
-  RAW
+  RAW,
 }
 
 export enum AccountType {

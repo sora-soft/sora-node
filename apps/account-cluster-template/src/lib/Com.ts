@@ -1,10 +1,11 @@
-import {RedisComponent} from '@sora-soft/redis-component';
 import {DatabaseComponent} from '@sora-soft/database-component';
-import {Account, AccountAuthGroup, AccountLogin, AccountToken} from '../app/database/Account.js';
 import {EtcdComponent} from '@sora-soft/etcd-component';
+import {Runtime} from '@sora-soft/framework';
+import {RedisComponent} from '@sora-soft/redis-component';
+
+import {Account, AccountAuthGroup, AccountLogin, AccountToken} from '../app/database/Account.js';
 import {AuthGroup, AuthPermission} from '../app/database/Auth.js';
 import {AliCloudComponent} from '../com/alicloud/AliCloudComponent.js';
-import {Runtime} from '@sora-soft/framework';
 
 export enum ComponentName {
   BusinessRedis = 'business-redis',
