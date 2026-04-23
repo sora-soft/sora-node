@@ -6,16 +6,12 @@ export async function prepare(ctx) {
       message: 'Component name (e.g., business-redis)',
       default: 'redis',
     },
-    {
-      type: 'input',
-      name: 'enumKey',
-      message: 'ComponentName enum key (e.g., BusinessRedis)',
-    },
   ];
 }
 
 export async function action(answers, ctx, helpers) {
-  const {componentName, enumKey} = answers;
+  const {componentName} = answers;
+  const enumKey = helpers.camelize(componentName, true);
   const fieldName = helpers.camelize(componentName, false);
   const packageName = ctx.packageName;
 
@@ -28,17 +24,17 @@ export async function action(answers, ctx, helpers) {
     registerCall: `Runtime.registerComponent(ComponentName.${enumKey}, this.${fieldName})`,
   });
 
-  const varPrefix = componentName.replace(/-/g, '_');
+  const varPrefix = fieldName;
   await helpers.appendToConfigTemplate({
     defines: [
-      { name: `${varPrefix}_url`, type: 'string', hint: `${componentName} URL` },
-      { name: `${varPrefix}_database`, type: 'number', hint: `${componentName} database index` },
+      { name: `${varPrefix}Url`, type: 'string', hint: `${componentName} URL` },
+      { name: `${varPrefix}Database`, type: 'number', hint: `${componentName} database index` },
     ],
     content: {
       components: {
         [componentName]: {
-          url: `$(${varPrefix}_url)`,
-          database: `$(${varPrefix}_database)`,
+          url: `$(${varPrefix}Url)`,
+          database: `$(${varPrefix}Database)`,
         },
       },
     },

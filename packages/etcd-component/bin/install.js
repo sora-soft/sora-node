@@ -6,16 +6,12 @@ export async function prepare(ctx) {
       message: 'Component name (e.g., etcd)',
       default: 'etcd',
     },
-    {
-      type: 'input',
-      name: 'enumKey',
-      message: 'ComponentName enum key (e.g., Etcd)',
-    },
   ];
 }
 
 export async function action(answers, ctx, helpers) {
-  const {componentName, enumKey} = answers;
+  const {componentName} = answers;
+  const enumKey = helpers.camelize(componentName, true);
   const fieldName = helpers.camelize(componentName, false);
   const packageName = ctx.packageName;
 
@@ -28,16 +24,16 @@ export async function action(answers, ctx, helpers) {
     registerCall: `Runtime.registerComponent(ComponentName.${enumKey}, this.${fieldName})`,
   });
 
-  const varPrefix = componentName.replace(/-/g, '_');
+  const varPrefix = fieldName;
   await helpers.appendToConfigTemplate({
     defines: [
-      { name: `${varPrefix}_host`, type: 'string', hint: `${componentName} host` },
+      { name: `${varPrefix}Host`, type: 'string', hint: `${componentName} host` },
     ],
     content: {
       components: {
         [componentName]: {
           etcd: {
-            hosts: [`$(${varPrefix}_host)`],
+            hosts: [`$(${varPrefix}Host)`],
           },
           ttl: 60,
           prefix: '$(projectScope)',

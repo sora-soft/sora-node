@@ -9,14 +9,8 @@ export async function prepare(ctx) {
     {
       type: 'input',
       name: 'componentName',
-      message: 'Component name (e.g., business-database)',
+      message: 'Component name (e.g., database)',
       default: 'database',
-    },
-    {
-      type: 'input',
-      name: 'enumKey',
-      message: 'ComponentName enum key (e.g., BusinessDB)',
-      default: 'BusinessDB'
     },
     {
       type: 'input',
@@ -28,7 +22,8 @@ export async function prepare(ctx) {
 }
 
 export async function action(answers, ctx, helpers) {
-  const { componentName, enumKey, migrationPath } = answers;
+  const { componentName, migrationPath } = answers;
+  const enumKey = helpers.camelize(componentName, true);
   const fieldName = helpers.camelize(componentName, false);
   const packageName = ctx.packageName;
 
@@ -54,26 +49,26 @@ export async function action(answers, ctx, helpers) {
     );
   }
 
-  const varPrefix = componentName.replace(/-/g, '_');
+  const varPrefix = fieldName;
   await helpers.appendToConfigTemplate({
     defines: [
-      { name: `${varPrefix}_type`, type: 'select', choices: ['mysql', 'postgres', 'mariadb', 'sqlite'], hint: `${componentName} database type` },
-      { name: `${varPrefix}_host`, type: 'string', hint: `${componentName} database host` },
-      { name: `${varPrefix}_port`, type: 'number', hint: `${componentName} database port` },
-      { name: `${varPrefix}_username`, type: 'string', hint: `${componentName} database username` },
-      { name: `${varPrefix}_password`, type: 'password', hint: `${componentName} database password` },
-      { name: `${varPrefix}_database`, type: 'string', hint: `${componentName} database name` },
+      { name: `${varPrefix}Type`, type: 'select', choices: ['mysql', 'postgres', 'mariadb', 'sqlite'], hint: `${componentName} database type` },
+      { name: `${varPrefix}Host`, type: 'string', hint: `${componentName} database host` },
+      { name: `${varPrefix}Port`, type: 'number', hint: `${componentName} database port` },
+      { name: `${varPrefix}Username`, type: 'string', hint: `${componentName} database username` },
+      { name: `${varPrefix}Password`, type: 'password', hint: `${componentName} database password` },
+      { name: `${varPrefix}Database`, type: 'string', hint: `${componentName} database name` },
     ],
     content: {
       components: {
         [componentName]: {
           database: {
-            type: `$(${varPrefix}_type)`,
-            host: `$(${varPrefix}_host)`,
-            port: `$(${varPrefix}_port)`,
-            'username*': `$(${varPrefix}_username)`,
-            'password*': `$(${varPrefix}_password)`,
-            database: `$(${varPrefix}_database)`,
+            type: `$(${varPrefix}Type)`,
+            host: `$(${varPrefix}Host)`,
+            port: `$(${varPrefix}Port)`,
+            'username*': `$(${varPrefix}Username)`,
+            'password*': `$(${varPrefix}Password)`,
+            database: `$(${varPrefix}Database)`,
           },
         },
       },
@@ -129,23 +124,23 @@ export async function action(answers, ctx, helpers) {
 
   await helpers.appendToCommandConfigTemplate({
     defines: [
-      { name: `${varPrefix}_type`, type: 'select', choices: ['mysql', 'postgres', 'mariadb', 'sqlite'], hint: `${componentName} database type` },
-      { name: `${varPrefix}_host`, type: 'string', hint: `${componentName} database host` },
-      { name: `${varPrefix}_port`, type: 'number', hint: `${componentName} database port` },
-      { name: `${varPrefix}_username`, type: 'string', hint: `${componentName} database username` },
-      { name: `${varPrefix}_password`, type: 'password', hint: `${componentName} database password` },
-      { name: `${varPrefix}_database`, type: 'string', hint: `${componentName} database name` },
+      { name: `${varPrefix}Type`, type: 'select', choices: ['mysql', 'postgres', 'mariadb', 'sqlite'], hint: `${componentName} database type` },
+      { name: `${varPrefix}Host`, type: 'string', hint: `${componentName} database host` },
+      { name: `${varPrefix}Port`, type: 'number', hint: `${componentName} database port` },
+      { name: `${varPrefix}Username`, type: 'string', hint: `${componentName} database username` },
+      { name: `${varPrefix}Password`, type: 'password', hint: `${componentName} database password` },
+      { name: `${varPrefix}Database`, type: 'string', hint: `${componentName} database name` },
     ],
     content: {
       components: {
         [componentName]: {
           database: {
-            type: `$(${varPrefix}_type)`,
-            host: `$(${varPrefix}_host)`,
-            port: `$(${varPrefix}_port)`,
-            'username*': `$(${varPrefix}_username)`,
-            'password*': `$(${varPrefix}_password)`,
-            database: `$(${varPrefix}_database)`,
+            type: `$(${varPrefix}Type)`,
+            host: `$(${varPrefix}Host)`,
+            port: `$(${varPrefix}Port)`,
+            'username*': `$(${varPrefix}Username)`,
+            'password*': `$(${varPrefix}Password)`,
+            database: `$(${varPrefix}Database)`,
           },
         },
       },
