@@ -1,0 +1,58 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "out": "docs/reference",
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "markdown",
+
+  "name": "@sora-soft/framework API Reference",
+  "includeVersion": true,
+
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Core",
+    "RPC",
+    "Transport",
+    "Context",
+    "Discovery",
+    "Logging",
+    "Tracing",
+    "Codec",
+    "Utilities",
+    "Errors",
+    "Interfaces",
+    "Types",
+    "Constants",
+    "Enums",
+    "*"
+  ],
+
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+
+  "textContentMappings": {
+    "title": "@sora-soft/framework"
+  },
+
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "../../transformer/VersionTransformer.cjs"
+      },
+      {
+        "transform": "@sora-soft/typia-decorator/transform"
+      },
+      {
+        "transform": "typia/lib/transform"
+      }
+    ]
+  }
+}
