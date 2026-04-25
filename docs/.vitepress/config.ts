@@ -54,7 +54,7 @@ export default defineConfig({
   lang: 'zh-CN',
   title: 'Sora',
   description: '高性能 TypeScript 微服务框架',
-  base: '/sora-monorepo/',
+  base: '/',
   lastUpdated: true,
   cleanUrls: true,
   ignoreDeadLinks: true,
