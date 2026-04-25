@@ -7,7 +7,7 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
-    "docs:api": "typedoc && if (Test-Path api/README.md) { Rename-Item api/README.md index.md }"
+    "docs:api": "typedoc && (test -f api/README.md && mv api/README.md api/index.md || true)"
   },
   "devDependencies": {
     "vitepress": "1.6.4",
