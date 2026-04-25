@@ -38,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build typia-decorator
+        run: pnpm --filter @sora-soft/typia-decorator run build
+
       - name: Build framework
         run: pnpm --filter @sora-soft/framework run build
 
