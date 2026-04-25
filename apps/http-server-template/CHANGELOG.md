@@ -1,5 +1,12 @@
 # @sora-soft/http-server-template
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @sora-soft/http-support@2.0.3
+
 ## 1.0.3
 
 ### Patch Changes

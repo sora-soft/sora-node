@@ -1,5 +1,11 @@
 # @sora-soft/http-support
 
+## 2.0.3
+
+### Patch Changes
+
+- 修复拼写错误
+
 ## 2.0.2
 
 ### Patch Changes
