@@ -43,9 +43,9 @@ sora new my-project
 
 | 包 | 说明 |
 |---|---|
-| [`@sora-soft/framework`](https://sora-soft.github.io/sora-monorepo/microservice/core-concepts) | 核心框架：RPC、生命周期、组件、追踪等 |
-| [`@sora-soft/sora-cli`](https://sora-soft.github.io/sora-monorepo/cli/commands) | CLI 脚手架工具 |
-| [`@sora-soft/typia-decorator`](https://sora-soft.github.io/sora-monorepo/tools/validation) | `@guard` 参数校验装饰器 |
+| `@sora-soft/framework` | 核心框架：RPC、生命周期、组件、追踪等 |
+| `@sora-soft/sora-cli` | CLI 脚手架工具 |
+| `@sora-soft/typia-decorator` | `@guard` 参数校验装饰器 |
 | `@sora-soft/redis-component` | Redis 组件 |
 | `@sora-soft/database-component` | Database 组件 |
 | `@sora-soft/etcd-component` | etcd 组件 |
