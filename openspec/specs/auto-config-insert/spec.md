@@ -1,6 +1,4 @@
-# auto-config-insert
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement:Auto-insert service config on generate
 When `generate:service` completes successfully (TS files generated), the system MUST automatically insert a corresponding entry into the specified config template file's `services:` section. The entry key MUST be the dash-case service name. The entry content MUST include listener config fragments for each selected listener type (tcp, http, websocket), or be `{}` if no listeners were selected.
@@ -31,19 +29,8 @@ When `generate:command` completes successfully, the system MUST automatically in
 - **When** `generate:command auth` completes
 - **Then** the config template file's `workers:` section MUST contain an entry `auth-command: {}`
 
-### Requirement:Config template path resolution
-The system MUST accept a `--config-template` CLI flag on `generate:service`, `generate:worker`, and `generate:command`. When not provided, the system MUST interactively prompt the user with a default value: `run/config.template.yml` for service and worker, `run/config-command.template.yml` for command. The path MUST be resolved relative to `process.cwd()`.
-
-#### Scenario:Flag provided
-- **When** `generate:service auth --config-template custom/path.yml` is run
-- **Then** the system MUST use `custom/path.yml` as the config template path
-
-#### Scenario:Flag not provided
-- **When** `generate:service auth` is run without `--config-template`
-- **Then** the system MUST prompt the user with default value `run/config.template.yml`
-
 ### Requirement:Duplicate detection
-Before inserting a new config entry, the system MUST parse the YAML content (excluding `#define` lines) using js-yaml and check whether the target key already exists under the target section. If it exists, the system MUST output a warning and skip insertion without erroring. The `checkDuplicate` 方法 MUST 接受任意 section 名称（不限于 `services` 和 `workers`）。When using structured `content`（`Record<string, any>`），section 名称 MUST 从 content 的顶层 key 推导，entry key MUST 从 content[section] 的第一层 key 推导。
+Before inserting a new config entry, the system MUST parse the YAML content (excluding `#define` lines) using js-yaml and check whether the target key already exists under the target section. If it exists, the system MUST output a warning and skip insertion without erroring. The `checkDuplicate` 方法 MUST 接受任意 section 名称（不限于 `services` 和 `workers`）。
 
 #### Scenario:Service already exists in config
 - **When** `generate:service auth` is run but `services.auth` already exists in the config template
@@ -54,7 +41,7 @@ Before inserting a new config entry, the system MUST parse the YAML content (exc
 - **Then** the system MUST log a warning message and MUST NOT modify the config template
 
 #### Scenario:Component already exists in config
-- **When** install script 提供 `content: {components: {database: {...}}}` 但 `components.database` 已存在于 config template
+- **When** install script 插入 `components.database` 但该 key 已存在
 - **Then** 系统 MUST 输出警告并跳过插入
 
 ### Requirement:Preserve original file format
@@ -65,7 +52,7 @@ The config template insertion MUST use string matching and text splicing, NOT YA
 - **Then** all `#define` lines MUST remain unchanged and in their original positions, blank lines between top-level keys MUST be preserved, and only the `services:` section MUST contain the new entry
 
 ### Requirement:Handle section variants
-The system MUST handle three forms of `services:` / `workers:` sections in config templates: inline empty (`xxx: {}`), block with existing entries (`xxx:` on its own line with indented children), and absent (section not present in file). For inline empty, the entire line MUST be replaced. For block form, the new entry MUST be inserted as the first child. For absent, the section MUST be appended at file end.
+The system MUST handle three forms of config template sections: inline empty (`xxx: {}`), block with existing entries (`xxx:` on its own line with indented children), and absent (section not present in file). For inline empty, the entire line MUST be replaced. For block form, the new entry MUST be inserted as the first child. For absent, the section MUST be appended at file end. 这 MUST 适用于任意 section 名称，不仅限于 `services` 和 `workers`。
 
 #### Scenario:Inline empty workers
 - **When** config template contains `workers: {}` and a worker is generated
@@ -78,3 +65,27 @@ The system MUST handle three forms of `services:` / `workers:` sections in confi
 #### Scenario:Missing section
 - **When** config template has no `workers:` section and a worker is generated
 - **Then** `workers:\n  name: {}` MUST be appended at the end of the file
+
+#### Scenario:Missing components section
+- **When** install script 向 `components` section 插入内容但文件中没有 `components:` section
+- **Then** `components:\n  <content>` MUST be追加到文件末尾
+
+## ADDED Requirements
+
+### Requirement:Append define statements
+系统 MUST 支持向 config template 追加新的 `#define` 语句。追加前 MUST 检查变量名是否已存在（通过 `defineKeys` Set）。已存在的同名变量 MUST 被跳过，不重复添加。
+
+#### Scenario:New define variables added
+- **When** install script 提供 `defines: ["#define(db-host,string,数据库地址)", "#define(db-port,number,数据库端口)"]` 且这些变量名不存在
+- **Then** 这些 `#define` 行 MUST 被追加到文件顶部的 define 区域
+
+#### Scenario:Duplicate define skipped
+- **When** install script 提供 `defines: ["#define(host,string,...)"]` 但 `host` 变量已存在
+- **Then** 该 `#define` 行 MUST 被跳过，不重复添加
+
+### Requirement:appendToConfigTemplate helper method
+`ConfigTemplateInserter` MUST 提供 `appendToConfigTemplate(templatePath, entry, log)` 静态方法。该方法 MUST 接受 `ConfigTemplateEntry`（包含 `section`、`defines`、`content`），自动处理 `#define` 追加（去重）和 YAML section 追加。
+
+#### Scenario:Helper called from install script
+- **When** 通过 helpers 调用 `appendToConfigTemplate({section: "components", defines: [...], content: "..."})`
+- **Then** 文件 MUST 同时包含新增的 `#define` 行和新增的 section 内容
