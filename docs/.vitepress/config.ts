@@ -56,6 +56,7 @@ export default defineConfig({
   description: '高性能 TypeScript 微服务框架',
   lastUpdated: true,
   cleanUrls: true,
+  ignoreDeadLinks: true,
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
