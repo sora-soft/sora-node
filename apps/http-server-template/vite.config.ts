@@ -10,9 +10,11 @@ const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')
 const SRC = resolve(__dirname, 'src').replaceAll('\\', '/');
 
 export default defineConfig({
+  esbuild: false,
+  oxc: false,
   plugins: [
     typiaDecorator({ enforce: 'pre' }),
-    UnpluginTypia({ enforce: 'pre' }),
+    UnpluginTypia({ enforce: 'pre', cache: true }),
     {
       ...swc({
         swcOptions: {
@@ -45,7 +47,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external(id: string) {
         if (id.startsWith('.') || id.startsWith('/')) return false;
         if (id.replaceAll('\\', '/').startsWith(SRC + '/')) return false;
