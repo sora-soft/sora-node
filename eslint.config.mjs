@@ -60,6 +60,8 @@ export default [
       }],
       "space-in-parens": ["error", "never"],
       '@typescript-eslint/no-unused-vars': ['warn', {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
         destructuredArrayIgnorePattern: '^_',
         caughtErrorsIgnorePattern: '^_',
       }],
@@ -83,10 +85,12 @@ export default [
         },
         {
           "selector": "variable",
+          "leadingUnderscore": "allow",
           "format": ["camelCase"]
         },
         {
           "selector": "parameter",
+          "leadingUnderscore": "allow",
           "format": ["camelCase"]
         },
         {

@@ -248,7 +248,7 @@ class Provider<T extends Route = Route> {
         await Promise.race(connecting.map(async (s) => {
           await s.connector.waitForReady(NodeTime.second(5));
           return s;
-        })).catch(err => {
+        })).catch(_err => {
           throw new RPCError(RPCErrorCode.ErrRpcSenderNotFound, 'sender not found');
         });
         return this.selectSender(toId);

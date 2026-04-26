@@ -18,7 +18,6 @@ import {Logger} from '../../logger/Logger.js';
 import {Runtime} from '../../Runtime.js';
 import {RpcClientTraceContext} from '../../trace/context/RpcClientTraceContext.js';
 import {Trace} from '../../trace/Trace.js';
-import {TraceContext} from '../../trace/TraceContext.js';
 import type {Codec} from '../Codec.js';
 import type {Connector} from '../Connector.js';
 import type {ListenerCallback} from '../Listener.js';
@@ -119,7 +118,7 @@ export class RPCSender {
       }
       // 符合 W3C 规范的 trace-context
       // https://www.w3.org/TR/trace-context/
-      const traceScope = Context.find(TraceContext);
+      const traceScope = Trace.current();
       if (traceScope) {
         request.setHeader(RPCHeader.RPCTraceParent, traceScope.toRPCTraceParentHeader());
         request.setHeader(RPCHeader.RPCTraceState, traceScope.toRPCTraceStateHeader());

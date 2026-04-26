@@ -61,7 +61,7 @@ abstract class Worker {
     this.lifeCycle_.setState(WorkerState.Stopped);
   }
 
-  async runCommand(...args: unknown[]) {
+  async runCommand(..._args: unknown[]) {
     return false;
   }
 

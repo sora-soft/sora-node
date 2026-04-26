@@ -1,4 +1,4 @@
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, type Subscription} from 'rxjs';
 
 import {type ErrorArgs, ErrorLevel, ExError} from './ExError.js';
 import {TimeoutError} from './TimeoutError.js';
@@ -33,17 +33,23 @@ class LifeCycle<T extends number> {
   }
 
   waitFor(state: T, ttlMs: number) {
+    if (this.state_ === state) {
+      return Promise.resolve();
+    }
+
     return new Promise<void>((resolve, reject) => {
+      let sub: Subscription | null = null;
+
       const timer = setTimeout(() => {
-        sub.unsubscribe();
+        sub?.unsubscribe();
         reject(new TimeoutError());
       }, ttlMs);
 
-      const sub = this.stateSubject_.subscribe((s) => {
+      sub = this.stateSubject_.subscribe((s) => {
         if (s === state) {
           clearTimeout(timer);
           resolve();
-          sub.unsubscribe();
+          sub?.unsubscribe();
         }
       });
     });
