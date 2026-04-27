@@ -1,5 +1,19 @@
 # @sora-soft/http-server-template
 
+## 1.1.0
+
+### Minor Changes
+
+- a442c83: 修复 vite 编译报错的问题
+
+### Patch Changes
+
+- Updated dependencies [a442c83]
+  - @sora-soft/typia-decorator@2.1.0
+  - @sora-soft/ram-discovery@2.1.0
+  - @sora-soft/http-support@2.1.0
+  - @sora-soft/framework@2.1.0
+
 ## 1.0.6
 
 ### Patch Changes
