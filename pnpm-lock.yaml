@@ -801,8 +801,6 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/typia-decorator/dist/transform: {}
-
   packages/typia-decorator/src/transform: {}
 
 packages:
