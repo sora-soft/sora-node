@@ -1,4 +1,0 @@
-import unplugin from './index.js';
-
-const esbuild: typeof unplugin.esbuild = unplugin.esbuild;
-export default esbuild;

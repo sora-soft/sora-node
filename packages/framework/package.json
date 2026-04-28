@@ -5,11 +5,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && vite build",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "build": "npm run clean && tsc",
     "clean": "rimraf ./dist",
-    "prepublishOnly": "vite build",
+    "prepublishOnly": "tsc",
     "lint": "eslint src/",
     "preversion": "eslint src/ && npm run build"
   },
@@ -38,7 +36,6 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/eslint-plugin-ts": "^4.4.1",
-    "@swc/core": "^1.15.30",
     "@types/node": "^24.0.0",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
@@ -49,11 +46,7 @@
     "rimraf": "^3.0.2",
     "typedoc": "^0.28.19",
     "typedoc-plugin-markdown": "^4.11.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-swc-transform": "^1.1.1",
-    "vitest": "^4.1.5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@sora-soft/typia-decorator": "workspace:*",

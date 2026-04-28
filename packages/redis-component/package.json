@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && vite build",
+    "build": "npm run clean && tsc",
     "clean": "rimraf ./dist",
-    "prepublishOnly": "vite build",
+    "prepublishOnly": "tsc",
     "lint": "eslint src/",
     "preversion": "eslint src/ && npm run build"
   },
@@ -38,13 +38,9 @@
   },
   "homepage": "https://github.com/sora-soft/sora-node",
   "devDependencies": {
-    "@swc/core": "^1.15.30",
     "@types/redlock": "^4.0.4",
     "rimraf": "^3.0.2",
-    "typescript": "^5.9.3",
-    "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-swc-transform": "^1.1.1"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@sora-soft/framework": "workspace:*",
