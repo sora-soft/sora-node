@@ -68,4 +68,6 @@ web_modules/
 
 TODO
 
+dist-test/
+
 .gitconfig

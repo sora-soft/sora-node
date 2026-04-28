@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {type ILoggerData, LogLevel} from './Logger.js';
 import {LoggerOutput} from './LoggerOutput.js';

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {OPCode} from '../../../Enum.js';
 import {Notify} from './Notify.js';
@@ -16,38 +16,38 @@ describe('RawPacket', () => {
   }
 
   it('should store and retrieve headers', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'test'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'test'});
     packet.setHeader('x-key', 'value');
     expect(packet.getHeader('x-key')).toBe('value');
   });
 
   it('should return undefined for missing header', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'test'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'test'});
     expect(packet.getHeader('missing')).toBeUndefined();
   });
 
   it('should not set header when value is undefined', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'test'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'test'});
     packet.setHeader('x-key', undefined);
     expect(packet.getHeader('x-key')).toBeUndefined();
   });
 
   it('should load multiple headers', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'test'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'test'});
     packet.loadHeaders({a: '1', b: '2'});
     expect(packet.getHeader('a')).toBe('1');
     expect(packet.getHeader('b')).toBe('2');
   });
 
   it('should get and set payload', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'initial'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'initial'});
     expect(packet.payload).toBe('initial');
     packet.payload = 'updated';
     expect(packet.payload).toBe('updated');
   });
 
   it('should expose headers as object via getter', () => {
-    const packet = new TestPacket(OPCode.Request, {payload: 'test'});
+    const packet = new TestPacket(OPCode.Request, {headers: {}, payload: 'test'});
     packet.setHeader('x-a', '1');
     expect(packet.headers).toEqual({'x-a': '1'});
   });
@@ -77,9 +77,9 @@ describe('Request', () => {
     });
     const packet = req.toPacket();
     expect(packet.opcode).toBe(OPCode.Request);
-    expect(packet.method).toBe('test');
-    expect(packet.service).toBe('svc');
-    expect(packet.payload).toBe('data');
+    expect((packet as any).method).toBe('test');
+    expect((packet as any).service).toBe('svc');
+    expect((packet as any).payload).toBe('data');
   });
 });
 
@@ -125,7 +125,7 @@ describe('Response', () => {
       headers: {},
       payload: {error: null, result: null},
     });
-    res.payload = {error: null, result: 'new'};
+    res.payload = {error: null, result: 'new'} as any;
     expect(res.payload.result).toBe('new');
   });
 });
@@ -153,7 +153,7 @@ describe('Notify', () => {
     });
     const packet = notify.toPacket();
     expect(packet.opcode).toBe(OPCode.Notify);
-    expect(packet.method).toBe('test');
-    expect(packet.payload).toEqual({data: 1});
+    expect((packet as any).method).toBe('test');
+    expect((packet as any).payload).toEqual({data: 1});
   });
 });

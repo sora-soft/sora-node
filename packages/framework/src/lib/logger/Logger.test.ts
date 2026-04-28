@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {ErrorLevel, ExError} from '../../utility/ExError.js';
+import {FrameworkErrorCode} from '../../ErrorCode.js';
 import {FrameworkError} from '../../utility/FrameworkError.js';
 import {Context} from '../context/Context.js';
 import {RootScope} from '../context/scope/RootScope.js';
@@ -189,7 +190,7 @@ describe('Logger', () => {
 
   describe('errorMessage()', () => {
     it('should serialize ExError', () => {
-      const err = new FrameworkError('test message');
+      const err = new FrameworkError(FrameworkErrorCode.ErrFrameworkUnknown, 'test message');
       const serialized = Logger.errorMessage(err);
       expect(serialized).toMatchObject({
         code: err.code,

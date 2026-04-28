@@ -9,7 +9,10 @@
     "clean": "rimraf ./dist",
     "prepublishOnly": "tsc",
     "lint": "eslint src/",
-    "preversion": "eslint src/ && npm run build"
+    "preversion": "eslint src/ && npm run build",
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build:test && node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:only": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "repository": "git@github.com:sora-soft/sora-node.git",
   "type": "module",
@@ -34,6 +37,7 @@
   },
   "homepage": "https://github.com/sora-soft/sora-node",
   "devDependencies": {
+    "@jest/globals": "^30.3.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/eslint-plugin-ts": "^4.4.1",
     "@types/node": "^24.0.0",
@@ -43,6 +47,7 @@
     "eslint": "^9.39.4",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
+    "jest": "^30.3.0",
     "rimraf": "^3.0.2",
     "typedoc": "^0.28.19",
     "typedoc-plugin-markdown": "^4.11.0",

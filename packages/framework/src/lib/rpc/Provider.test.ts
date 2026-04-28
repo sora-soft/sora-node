@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../../lib/codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {RPCHeader} from '../../Const.js';
 import {ListenerState, OPCode} from '../../Enum.js';
@@ -110,7 +110,7 @@ describe('Provider', () => {
 
   it('should throw when calling rpc without senders', async () => {
     const {provider} = await setup();
-    await expect(provider.rpc().test({})).rejects.toThrow();
+    await expect((provider.rpc() as any).test({})).rejects.toThrow();
   });
 
   it('should perform RPC call through provider', async () => {
@@ -132,7 +132,7 @@ describe('Provider', () => {
       }
     });
 
-    const result = await provider.rpc().echo({msg: 'hello'});
+    const result = await (provider.rpc() as any).echo({msg: 'hello'});
     expect(result).toEqual({msg: 'hello'});
   });
 
@@ -152,7 +152,7 @@ describe('Provider', () => {
       (s.connector as MockConnector).outgoing.on('data', (data: any) => received.push(data));
     }
 
-    await provider.broadcast().onEvent({action: 'update'});
+    await (provider.broadcast() as any).onEvent({action: 'update'});
     await wait(50);
 
     expect(received.length).toBe(2);
@@ -192,7 +192,7 @@ describe('Provider', () => {
       });
     }
 
-    await provider.rpc('srv-1').ping({seq: 1});
+    await (provider.rpc('srv-1') as any).ping({seq: 1});
     await wait(50);
 
     expect(receivedByTarget.get('srv-1')!.length).toBe(1);

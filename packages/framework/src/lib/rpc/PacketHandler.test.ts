@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../../lib/codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {RPCHeader} from '../../Const.js';
 import {OPCode} from '../../Enum.js';
@@ -34,7 +34,7 @@ describe('PacketHandler', () => {
         return {
           opcode: OPCode.Response,
           headers: {},
-          payload: {error: null, result: packet.payload},
+          payload: {error: null, result: (packet as any).payload},
         } as IRawResPacket;
       };
 

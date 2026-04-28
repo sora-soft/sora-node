@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import {Subject} from 'rxjs';
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {SubscriptionManager} from './SubscriptionManager.js';
 

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it, vi} from 'vitest';
+import {describe, expect, it, jest} from '@jest/globals';
 
 import {Trace} from './Trace.js';
 import {invalidSpanId, invalidTraceId, TraceContext, TraceFlag, TraceState} from './TraceContext.js';
@@ -140,7 +140,7 @@ describe('TraceContext', () => {
 
   describe('diagnostics_channel', () => {
     it('should publish start event', () => {
-      const handler = vi.fn();
+      const handler = jest.fn();
       TraceContext.startChannel.subscribe(handler);
       const ctx = new TestTraceContext();
       Trace.run(ctx, () => {});
@@ -150,7 +150,7 @@ describe('TraceContext', () => {
     });
 
     it('should publish end event', () => {
-      const handler = vi.fn();
+      const handler = jest.fn();
       TraceContext.endChannel.subscribe(handler);
       const ctx = new TestTraceContext();
       Trace.run(ctx, () => {});
@@ -160,7 +160,7 @@ describe('TraceContext', () => {
     });
 
     it('should publish end event on async rejection', async () => {
-      const handler = vi.fn();
+      const handler = jest.fn();
       TraceContext.endChannel.subscribe(handler);
       const ctx = new TestTraceContext();
       const promise = Trace.run(ctx, async () => {

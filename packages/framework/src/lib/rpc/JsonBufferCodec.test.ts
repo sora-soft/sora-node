@@ -1,15 +1,16 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {OPCode} from '../../Enum.js';
+import type {IRawReqPacket} from '../../interface/rpc.js';
 import {JsonBufferCodec} from '../codec/JsonBufferCodec.js';
 import {Codec} from './Codec.js';
 
 describe('JsonBufferCodec', () => {
   it('should encode and decode round-trip', async () => {
     const codec = new JsonBufferCodec();
-    const original = {
+    const original: IRawReqPacket = {
       opcode: OPCode.Request,
       method: 'test',
       service: 'svc',

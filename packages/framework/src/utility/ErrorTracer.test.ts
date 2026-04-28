@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {ErrorTracer} from './ErrorTracer.js';
 
@@ -21,7 +21,7 @@ describe('ErrorTracer', () => {
     const instance = new TestClass();
     try {
       await instance.failingMethod();
-      expect.fail('should have thrown');
+      throw new Error('should have thrown');
     } catch (err: any) {
       expect(err instanceof Error).toBe(true);
       expect(err.message).toBe('inner error');

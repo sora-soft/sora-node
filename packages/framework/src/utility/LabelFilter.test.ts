@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {FilterOperator, LabelFilter} from './LabelFilter.js';
 

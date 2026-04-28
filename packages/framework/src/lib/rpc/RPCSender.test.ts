@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../../lib/codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {RPCHeader} from '../../Const.js';
 import {ListenerState, OPCode} from '../../Enum.js';

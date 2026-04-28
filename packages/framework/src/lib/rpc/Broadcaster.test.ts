@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../../lib/codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {OPCode} from '../../Enum.js';
 import {MockConnector} from '../../test/tools/mock/MockConnector.js';

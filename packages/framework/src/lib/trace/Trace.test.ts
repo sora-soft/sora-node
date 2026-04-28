@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {Trace} from './Trace.js';
 import {TraceContext} from './TraceContext.js';

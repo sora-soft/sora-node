@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {Context} from '../Context.js';
 import {Scope} from '../Scope.js';
@@ -36,6 +36,6 @@ describe('RootScope', () => {
   it('should be the Context.root singleton', () => {
     expect(Context.root).toBeInstanceOf(RootScope);
     expect(Context.root.id).toBe('root');
-    expect(Context.root.logCategory).toBe('runtime');
+    expect((Context.root as LogScope<unknown>).logCategory).toBe('runtime');
   });
 });

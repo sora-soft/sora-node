@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {ArrayMap, NanoTime, NodeTime, UnixTime, Utility} from './Utility.js';
 
@@ -57,7 +57,7 @@ describe('Utility', () => {
     it('should return value within range', () => {
       for (let i = 0; i < 100; i++) {
         const val = Utility.randomInt(0, 10);
-        expect(val >= 0 && val < 10, `value ${val} out of range [0, 10)`).toBe(true);
+        expect(val >= 0 && val < 10).toBe(true);
       }
     });
     it('should return begin when begin >= end', () => {
@@ -89,7 +89,7 @@ describe('Utility', () => {
         const r = Utility.randomOneByWeight(arr, (e) => e === 'heavy' ? 1000 : 1);
         if (r === 'heavy') heavyCount++;
       }
-      expect(heavyCount > 90, `expected heavy to dominate, got ${heavyCount}/100`).toBe(true);
+      expect(heavyCount > 90).toBe(true);
     });
     it('should return null for empty array', () => {
       expect(Utility.randomOneByWeight([], () => 0)).toBeNull();

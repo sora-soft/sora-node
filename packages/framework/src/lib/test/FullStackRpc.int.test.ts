@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import '../codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {WorkerState} from '../../Enum.js';
 import {RamDiscovery} from '../../test/RamDiscovery.js';

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {RPCHeader} from '../../Const.js';
 import {OPCode} from '../../Enum.js';
@@ -90,7 +90,7 @@ describe('Route', () => {
         headers: {[RPCHeader.RpcIdHeader]: '123'}, payload: {},
       }, 'session-1', null as any);
 
-      expect(result!.payload.error.code).toBe(RPCErrorCode.ErrRpcMethodNotFound);
+      expect(result!.payload.error!.code).toBe(RPCErrorCode.ErrRpcMethodNotFound);
     });
 
     it('should serialize ExError to error response', async () => {
@@ -103,8 +103,8 @@ describe('Route', () => {
         headers: {[RPCHeader.RpcIdHeader]: '123'}, payload: {},
       }, 'session-1', null as any);
 
-      expect(result!.payload.error.code).toBe('TEST_ERROR');
-      expect(result!.payload.error.name).toBe('TestError');
+      expect(result!.payload.error!.code).toBe('TEST_ERROR');
+      expect(result!.payload.error!.name).toBe('TestError');
     });
 
     it('should preserve RpcId in response', async () => {
@@ -257,7 +257,7 @@ describe('Route', () => {
         headers: {[RPCHeader.RpcIdHeader]: '1'}, payload: {},
       }, 'session-1', null as any);
 
-      expect(result!.payload.result.val).toBe(42);
+      expect((result!.payload.result as any).val).toBe(42);
     });
   });
 
@@ -275,7 +275,7 @@ describe('Route', () => {
         headers: {[RPCHeader.RpcIdHeader]: '1'}, payload: {},
       }, 'session-1', null as any);
 
-      const err = result!.payload.error;
+      const err = result!.payload.error!;
       expect(err.code).toBe('CODE_123');
       expect(err.name).toBe('MyError');
       expect(err.message).toBe('oops');
@@ -291,7 +291,7 @@ describe('Route', () => {
         headers: {[RPCHeader.RpcIdHeader]: '1'}, payload: {},
       }, 'session-1', null as any);
 
-      expect(result!.payload.error.code).toBe(RPCErrorCode.ErrRpcMethodNotFound);
+      expect(result!.payload.error!.code).toBe(RPCErrorCode.ErrRpcMethodNotFound);
     });
   });
 });

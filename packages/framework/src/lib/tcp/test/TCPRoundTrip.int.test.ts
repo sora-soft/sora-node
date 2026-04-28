@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import '../../../lib/codec/JsonBufferCodec.js';
 
-import {afterEach, describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it} from '@jest/globals';
 
 import {RPCHeader} from '../../../Const.js';
 import {OPCode} from '../../../Enum.js';
-import type {IRawNetPacket, IRawResPacket} from '../../../interface/rpc.js';
+import type {IRawNetPacket, IRawReqPacket, IRawResPacket} from '../../../interface/rpc.js';
 import {Codec} from '../../../lib/rpc/Codec.js';
 import type {ListenerCallback} from '../../../lib/rpc/Listener.js';
 import {TCPConnector} from '../TCPConnector.js';
@@ -34,10 +34,11 @@ describe('TCP Round-Trip', () => {
   }
 
   const echoCallback: ListenerCallback = async (packet: IRawNetPacket) => {
+    const req = packet as IRawReqPacket;
     return {
       opcode: OPCode.Response,
-      headers: {[RPCHeader.RpcIdHeader]: packet.headers[RPCHeader.RpcIdHeader]},
-      payload: {error: null, result: packet.payload},
+      headers: {[RPCHeader.RpcIdHeader]: req.headers[RPCHeader.RpcIdHeader]},
+      payload: {error: null, result: req.payload},
     } as IRawResPacket;
   };
 

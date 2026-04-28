@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {DiagnosticsChannel, RPCHeader} from './Const.js';
 import {ConnectorCommand, ConnectorState, ListenerState, OPCode, WorkerState} from './Enum.js';

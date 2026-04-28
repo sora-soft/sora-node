@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it, jest} from '@jest/globals';
 
 import {ConsoleOutput} from './ConsoleOutput.js';
 import {type ILoggerData, LogLevel} from './Logger.js';
@@ -23,7 +23,7 @@ function makeLog(level: LogLevel, content = '"msg"'): ILoggerData {
 
 describe('ConsoleOutput', () => {
   let output: ConsoleOutput;
-  let logSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof jest.spyOn>;
 
   afterEach(async () => {
     if (logSpy) {
@@ -35,7 +35,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output debug with grey color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Debug));
     await new Promise(r => setTimeout(r, 50));
@@ -45,7 +45,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output info with cyan color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Info));
     await new Promise(r => setTimeout(r, 50));
@@ -53,7 +53,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output warn with yellow color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Warn));
     await new Promise(r => setTimeout(r, 50));
@@ -61,7 +61,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output success with green color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Success));
     await new Promise(r => setTimeout(r, 50));
@@ -69,7 +69,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output error with red color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Error));
     await new Promise(r => setTimeout(r, 50));
@@ -77,7 +77,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should output fatal with bgRed color', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Fatal));
     await new Promise(r => setTimeout(r, 50));
@@ -85,7 +85,7 @@ describe('ConsoleOutput', () => {
   });
 
   it('should format output with timeString,level,identify,category,position,content', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     output = new ConsoleOutput({});
     output.log(makeLog(LogLevel.Info, '"hello world"'));
     await new Promise(r => setTimeout(r, 50));
@@ -96,8 +96,8 @@ describe('ConsoleOutput', () => {
   });
 
   it('should use custom colors when provided', async () => {
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const customColor = (s: string) => `[CUSTOM]${s}[/CUSTOM]`;
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const customColor = ((s: string) => `[CUSTOM]${s}[/CUSTOM]`) as any;
     output = new ConsoleOutput({
       colors: {[LogLevel.Info]: customColor},
     });

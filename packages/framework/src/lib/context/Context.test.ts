@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {MockScope} from '../../test/tools/mock/MockScope.js';
 import {Context} from './Context.js';

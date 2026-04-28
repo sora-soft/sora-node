@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it} from '@jest/globals';
 
 import {RetryEvent} from '../Event.js';
 import {Retry, RetryError} from './Retry.js';
@@ -87,6 +87,6 @@ describe('Retry', () => {
     retry.errorEmitter.on(RetryEvent.Error, (_, nextRetry) => intervals.push(nextRetry));
     await retry.doJob();
     expect(intervals.length).toBe(2);
-    expect(intervals[1] >= intervals[0], `expected incrementing intervals: ${intervals}`).toBe(true);
+    expect(intervals[1] >= intervals[0]).toBe(true);
   });
 });
