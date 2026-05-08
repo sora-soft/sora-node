@@ -57,7 +57,7 @@ sora new my-project
 
 ## 文档
 
-完整文档请访问 [sora-soft.github.io/sora-monorepo](https://sora-node.sorasoftware.com/)
+完整文档请访问 [https://sora-node.sorasoftware.com/](https://sora-node.sorasoftware.com/)
 
 - [指南](https://sora-node.sorasoftware.com/guide/getting-started)
 - [微服务架构](https://sora-node.sorasoftware.com/microservice/core-concepts)

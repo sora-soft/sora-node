@@ -54,6 +54,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@sora-soft/define-transform": "workspace:*",
     "@sora-soft/typia-decorator": "workspace:*",
     "chalk": "^5.6.2",
     "error-stack-parser": "^2.0.6",

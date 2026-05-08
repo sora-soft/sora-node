@@ -43,6 +43,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@sora-soft/define-transform": "workspace:*",
     "@sora-soft/framework": "workspace:*",
     "@sora-soft/typia-decorator": "workspace:*",
     "axios": "^1.15.0",

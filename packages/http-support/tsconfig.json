@@ -5,7 +5,7 @@
     "rootDir": "./src",
     "plugins": [
       { "transform": "typia/lib/transform" },
-      { "transform": "../../scripts/version-transform", "identifier": "__VERSION__" }
+      { "transform": "@sora-soft/define-transform/transform", "defines": { "__VERSION__": { "pkg": "version" } } }
     ]
   },
   "include": ["src/**/*"],

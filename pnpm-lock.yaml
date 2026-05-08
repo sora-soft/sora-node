@@ -350,6 +350,9 @@ importers:
 
   packages/database-component:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/framework':
         specifier: workspace:*
         version: link:../framework
@@ -373,8 +376,30 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/define-transform:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      copyfiles:
+        specifier: ^2.4.1
+        version: 2.4.1
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/define-transform/dist/transform: {}
+
+  packages/define-transform/src/transform: {}
+
   packages/etcd-component:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/framework':
         specifier: workspace:*
         version: link:../framework
@@ -394,6 +419,9 @@ importers:
 
   packages/etcd-discovery:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/etcd-component':
         specifier: workspace:*
         version: link:../etcd-component
@@ -413,6 +441,9 @@ importers:
 
   packages/framework:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/typia-decorator':
         specifier: workspace:*
         version: link:../typia-decorator
@@ -483,6 +514,9 @@ importers:
 
   packages/http-support:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/framework':
         specifier: workspace:*
         version: link:../framework
@@ -538,6 +572,9 @@ importers:
 
   packages/ram-discovery:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/framework':
         specifier: workspace:*
         version: link:../framework
@@ -554,6 +591,9 @@ importers:
 
   packages/redis-component:
     dependencies:
+      '@sora-soft/define-transform':
+        specifier: workspace:*
+        version: link:../define-transform
       '@sora-soft/framework':
         specifier: workspace:*
         version: link:../framework
