@@ -1,5 +1,11 @@
 # @sora-soft/etcd-component
 
+## 2.2.1
+
+### Patch Changes
+
+- 656d8b1: feat: 修改项目模板中的问题
+
 ## 2.2.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @sora-soft/http-server-template
 
+## 1.2.1
+
+### Patch Changes
+
+- 656d8b1: feat: 修改项目模板中的问题
+
 ## 1.2.0
 
 ### Minor Changes
