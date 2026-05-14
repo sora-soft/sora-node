@@ -1,9 +1,10 @@
-import axios from 'axios';
-import {type AxiosResponse} from 'axios';
 import fs from 'node:fs/promises';
-import yaml from 'js-yaml';
 import url from 'node:url';
 import util from 'node:util';
+
+import axios from 'axios';
+import {type AxiosResponse} from 'axios';
+import yaml from 'js-yaml';
 
 import {AppError} from '../app/AppError.js';
 import {AppErrorCode} from '../app/ErrorCode.js';
