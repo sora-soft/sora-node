@@ -1,5 +1,13 @@
 # @sora-soft/etcd-discovery
 
+## 2.2.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @sora-soft/framework@2.2.1
+  - @sora-soft/etcd-component@2.2.2
+
 ## 2.2.1
 
 ### Patch Changes

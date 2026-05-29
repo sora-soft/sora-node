@@ -1,5 +1,11 @@
 # @sora-soft/framework
 
+## 2.2.1
+
+### Patch Changes
+
+- 修复 service meta labels 字段缺省值类型错误的问题
+
 ## 2.2.0
 
 ### Minor Changes

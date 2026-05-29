@@ -1,5 +1,16 @@
 # @sora-soft/base-cluster-template
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @sora-soft/framework@2.2.1
+  - @sora-soft/database-component@2.2.1
+  - @sora-soft/etcd-component@2.2.2
+  - @sora-soft/etcd-discovery@2.2.2
+  - @sora-soft/http-support@2.2.1
+
 ## 1.2.1
 
 ### Patch Changes
