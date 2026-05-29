@@ -149,7 +149,7 @@ abstract class Service extends Worker {
       nodeId: Runtime.node.id,
       state: this.state,
       startTime: this.startTime_,
-      labels: this.options_.labels || [] as unknown as ILabels,
+      labels: this.options_.labels || {} as ILabels,
     });
   }
 
