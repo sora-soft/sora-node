@@ -1,5 +1,11 @@
 # @sora-soft/framework
 
+## 2.2.2
+
+### Patch Changes
+
+- 修复 RPCResponseError 屏蔽错误详情问题
+
 ## 2.2.1
 
 ### Patch Changes

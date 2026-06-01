@@ -41,6 +41,17 @@ describe('RPCResponseError', () => {
     expect(err.level).toBe(ErrorLevel.Unexpected);
     expect(err.args).toEqual({method: 'someMethod'});
   });
+
+  it('should preserve original args from payload error', () => {
+    const err = new RPCResponseError({
+      code: 'REMOTE_ERR',
+      message: 'remote error',
+      level: ErrorLevel.Expected,
+      name: 'RemoteError',
+      args: {key1: 'value1', key2: 42},
+    }, 'someMethod');
+    expect(err.args).toEqual({key1: 'value1', key2: 42, method: 'someMethod'});
+  });
 });
 
 describe('RouteError', () => {

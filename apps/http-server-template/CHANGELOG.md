@@ -1,5 +1,14 @@
 # @sora-soft/http-server-template
 
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @sora-soft/framework@2.2.2
+  - @sora-soft/http-support@2.2.2
+  - @sora-soft/ram-discovery@2.2.2
+
 ## 1.2.2
 
 ### Patch Changes

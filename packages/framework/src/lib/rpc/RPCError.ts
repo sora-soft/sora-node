@@ -10,7 +10,7 @@ export class RPCError extends ExError {
 
 export class RPCResponseError extends ExError {
   constructor(error: IPayloadError, method: string) {
-    super(error.code, 'RPCResponseError', error.message, error.level, {method});
+    super(error.code, 'RPCResponseError', error.message, error.level, {...error.args, method});
     Error.captureStackTrace(this, this.constructor);
   }
 }
