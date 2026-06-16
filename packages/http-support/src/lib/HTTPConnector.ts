@@ -214,15 +214,19 @@ class HTTPConnector extends Connector {
       return;
     }
 
+    const headers: Record<string, string> = {
+      ...Object.fromEntries(
+        Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? JSON.stringify(v) : v as string])
+      ),
+      [HTTPHeader.HttpMethodHeader]: ctx.method.toLocaleLowerCase(),
+    };
+    if (!headers[RPCHeader.RpcIdHeader]) {
+      headers[RPCHeader.RpcIdHeader] = '1';
+    }
+
     const packet: IRawNetPacket = {
       opcode: OPCode.Request,
-      headers: {
-        ...Object.fromEntries(
-          Object.entries(req.headers).map(([k, v]) => [k, Array.isArray(v) ? JSON.stringify(v) : v as string])
-        ),
-        [RPCHeader.RpcIdHeader]: '1',
-        [HTTPHeader.HttpMethodHeader]: ctx.method.toLocaleLowerCase(),
-      },
+      headers,
       method,
       service,
       payload,
