@@ -1,5 +1,11 @@
 # @sora-soft/http-support
 
+## 2.2.3
+
+### Patch Changes
+
+- 3ba31ed: 修复 HTTPConnector 硬编码 RpcId 造成请求端超时的问题
+
 ## 2.2.2
 
 ### Patch Changes
