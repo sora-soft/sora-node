@@ -1,5 +1,11 @@
 # @sora-soft/etcd-discovery
 
+## 2.2.5
+
+### Patch Changes
+
+- 7ea31c3: 修复 ETCDDiscovery 启停未配对调用 EtcdComponent 的 start/stop，导致组件引用计数只增不减、组件无法真正断开的问题
+
 ## 2.2.4
 
 ### Patch Changes
