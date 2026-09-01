@@ -112,6 +112,23 @@ class EtcdComponent extends Component {
     return this.lease_;
   }
 
+  /**
+   * 创建一个由调用方独享的 lease，与组件自身的 lease 互不影响。
+   * 该 lease 不受组件管理，调用方负责在其生命周期结束时 revoke。
+   * etcd 连接断开重连后该 lease 会失效，调用方可监听组件的 LeaseReconnect 事件重新创建。
+   */
+  async createLease(ttl?: number): Promise<Lease> {
+    if (!this.etcdOptions_)
+      throw new FrameworkError(FrameworkErrorCode.ErrComponentOptionsNotSet, 'etcd component options not set');
+
+    if (!this.etcd_)
+      throw new FrameworkError(FrameworkErrorCode.ErrComponentNotConnected, 'component not connected');
+
+    const lease = this.etcd_.lease(ttl ?? this.etcdOptions_.ttl);
+    await lease.grant();
+    return lease;
+  }
+
   protected async disconnect() {
     this.destroyed_ = true;
     if (this.lease_) {

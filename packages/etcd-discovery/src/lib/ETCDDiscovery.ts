@@ -61,9 +61,17 @@ class ETCDDiscovery extends Discovery {
       throw new ETCDDiscoveryError(ETCDDiscoveryErrorCode.ErrComponentNotFound, 'ERR_COMPONENT_NOT_FOND');
 
     await this.component_.start();
-    this.component_.emitter.on(EtcdEvent.LeaseReconnect, async (lease) => {
+    this.component_.emitter.on(EtcdEvent.LeaseReconnect, async () => {
       Runtime.frameLogger.warn('etcd-discovery', {event: 'etcd-lease-reconnected'});
-      this.lease_ = lease;
+      // 旧 lease 绑定在已关闭的旧连接上，仅停止本地心跳，等待 TTL 自然过期
+      this.lease_?.release();
+      this.lease_ = undefined;
+      try {
+        this.lease_ = await this.component_!.createLease();
+      } catch (err) {
+        Runtime.frameLogger.error('etcd-discovery', err as ExError, {event: 'grant-lease-error', error: Logger.errorMessage(err as ExError)});
+        return;
+      }
       for(const [_, service] of this.localServiceIdMap_) {
         this.registerService(service).catch((err: ExError) => {
           Runtime.frameLogger.error('etcd-discovery', err, {event: 'register-service', error: Logger.errorMessage(err)});
@@ -90,7 +98,7 @@ class ETCDDiscovery extends Discovery {
     });
 
     this.etcd_ = this.component_.client;
-    this.lease_ = this.component_.lease;
+    this.lease_ = await this.component_.createLease();
 
     this.workerListWatcher_ = await this.etcd_.watch().prefix(`${this.workerPrefix}`).create();
     const workerPutSub = fromEvent(this.workerListWatcher_, 'put').subscribe(Context.wrap(([kv]: IKeyValue[]) => {
@@ -388,7 +396,11 @@ class ETCDDiscovery extends Discovery {
   async shutdown() {
     await this.executor_.stop();
     if (this.lease_) {
-      await this.lease_.revoke();
+      try {
+        await this.lease_.revoke();
+      } catch {
+        // lease may already be lost
+      }
       this.lease_ = undefined;
     }
     this.nodeSubject_.complete();
