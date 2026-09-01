@@ -459,7 +459,7 @@ class ETCDDiscovery extends Discovery {
     await this.executor_.doJob(async () => {
       if (!this.etcd_)
         throw new ETCDDiscoveryError(ETCDDiscoveryErrorCode.ErrEtcdNotConnected, 'ERR_ETCD_NOT_CONNECTED');
-      await this.etcd_.delete().key(`${this.endpointPrefix}/${id}`).exec();
+      await this.etcd_.delete().key(`${this.nodePrefix}/${id}`).exec();
       this.localNodeIdMap_.delete(id);
     });
   }
