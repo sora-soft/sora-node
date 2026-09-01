@@ -1,5 +1,11 @@
 # @sora-soft/etcd-component
 
+## 2.2.4
+
+### Patch Changes
+
+- 92bd677: 修复 ETCDDiscovery 关闭时误释放 EtcdComponent 共享 lease 的问题，EtcdComponent 新增 createLease 接口，ETCDDiscovery 改为持有独享的私有 lease
+
 ## 2.2.3
 
 ### Patch Changes

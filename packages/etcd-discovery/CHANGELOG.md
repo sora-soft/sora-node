@@ -1,5 +1,14 @@
 # @sora-soft/etcd-discovery
 
+## 2.2.4
+
+### Patch Changes
+
+- bf53f5a: 修复 unregisterNode 误用 endpointPrefix 导致节点无法注销、且可能误删 endpoint 的问题
+- 92bd677: 修复 ETCDDiscovery 关闭时误释放 EtcdComponent 共享 lease 的问题，EtcdComponent 新增 createLease 接口，ETCDDiscovery 改为持有独享的私有 lease
+- Updated dependencies [92bd677]
+  - @sora-soft/etcd-component@2.2.4
+
 ## 2.2.3
 
 ### Patch Changes

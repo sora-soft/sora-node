@@ -1,5 +1,14 @@
 # @sora-soft/account-cluster-template
 
+## 1.2.5
+
+### Patch Changes
+
+- Updated dependencies [bf53f5a]
+- Updated dependencies [92bd677]
+  - @sora-soft/etcd-discovery@2.2.4
+  - @sora-soft/etcd-component@2.2.4
+
 ## 1.2.4
 
 ### Patch Changes
