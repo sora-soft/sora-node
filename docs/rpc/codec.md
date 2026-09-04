@@ -132,7 +132,8 @@ const listener = new HTTPListener(
 import { WebSocketListener, JsonBufferCodec } from '@sora-soft/http-support';
 
 const listener = new WebSocketListener(
-  { port: 8080, path: '/ws' },
+  { port: 8080, entryPath: '/ws' },
+  undefined,  // 不需要处理普通 http 请求时传 undefined
   Route.callback(handler),
   [new JsonBufferCodec()],
 );

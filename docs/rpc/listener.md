@@ -108,7 +108,10 @@ const listener = new HTTPListener(
 基于 WebSocket 的长连接监听器：
 
 ```typescript
+import Koa from 'koa';
 import { WebSocketListener, JsonBufferCodec } from '@sora-soft/http-support';
+
+const koa = new Koa();
 
 const listener = new WebSocketListener(
   {
@@ -117,10 +120,13 @@ const listener = new WebSocketListener(
     entryPath: '/ws',
     exposeHost: '10.0.0.1',
   },
+  koa,  // 不需要处理普通 http 请求时传 undefined
   Route.callback(handler),
   [new JsonBufferCodec()],
 );
 ```
+
+第二参数传入 Koa 实例后，ws 端口上非 upgrade 的普通 http 请求（如健康检查）会经由该实例的中间件链处理；`ws` 只认领 `entryPath` 上的 upgrade 请求，两者互不干扰。也可通过 `listener.httpServer` 访问底层 `http.Server`。
 
 | 配置项 | 类型 | 说明 |
 |--------|------|------|
