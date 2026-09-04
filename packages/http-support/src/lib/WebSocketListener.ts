@@ -1,7 +1,9 @@
-import {type Codec, type ExError, type ILabels, Listener, type ListenerCallback, ListenerState, Logger, Runtime, Time, Utility} from '@sora-soft/framework';
 import http from 'node:http';
-import typia from 'typia';
 import util from 'node:util';
+
+import {type Codec, type ExError, type ILabels, Listener, type ListenerCallback, ListenerState, Logger, Runtime, Time, Utility} from '@sora-soft/framework';
+import type Koa from 'koa';
+import typia from 'typia';
 import {v4 as uuid} from 'uuid';
 import {WebSocketServer} from 'ws';
 
@@ -19,12 +21,13 @@ export interface IWebSocketListenerOptions {
 }
 
 class WebSocketListener extends Listener {
-  constructor(options: IWebSocketListenerOptions, callback: ListenerCallback, codecs: Codec<any>[], labels: ILabels = {}) {
+  constructor(options: IWebSocketListenerOptions, koa: Koa | undefined, callback: ListenerCallback, codecs: Codec<any>[], labels: ILabels = {}) {
     super(callback, codecs, labels);
 
     typia.assert<IWebSocketListenerOptions>(options);
     this.options_ = options;
-    this.httpServer_ = http.createServer();
+    this.koa_ = koa || null;
+    this.httpServer_ = http.createServer(this.koa_ ? this.koa_.callback() : undefined);
     this.usePort_ = 0;
     this.socketMap_ = new Map();
     this.socketServer_ = null;
@@ -32,6 +35,10 @@ class WebSocketListener extends Listener {
 
   get exposeHost() {
     return this.options_.exposeHost || this.options_.host;
+  }
+
+  get httpServer() {
+    return this.httpServer_;
   }
 
   get metaData() {
@@ -78,10 +85,13 @@ class WebSocketListener extends Listener {
   }
 
   protected async shutdown() {
+    // ws 不会关闭外部传入的 http server，需显式关闭以停止接收新连接并释放端口
+    const httpClosed = util.promisify(this.httpServer_.close.bind(this.httpServer_) as () => void)();
     // 要等所有 socket 由对方关闭
     if (this.socketServer_)
       await util.promisify(this.socketServer_.close.bind(this.socketServer_) as () => void)();
     this.socketServer_ = null;
+    await httpClosed;
   }
 
   private onServerError(err: Error) {
@@ -124,6 +134,7 @@ class WebSocketListener extends Listener {
 
   private options_: IWebSocketListenerOptions;
   private httpServer_: http.Server;
+  private koa_: Koa | null;
   private socketServer_: WebSocketServer | null;
   private socketMap_: Map<string, WebSocket>;
   private usePort_: number;

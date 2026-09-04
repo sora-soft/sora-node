@@ -45,7 +45,8 @@ class HttpGatewayService extends Service {
       this.httpListener_ = new HTTPListener(this.options_.httpListener, koa, ForwardRoute.callback(route), this.options_.httpListener.labels);
     }
     if (this.options_.websocketListener) {
-      this.websocketListener_ = new WebSocketListener(this.options_.websocketListener, ForwardRoute.callback(route), [new JsonBufferCodec()], this.options_.websocketListener.labels);
+      // 与 httpListener 共享同一个 koa，ws 端口上的普通 http 请求与 http 端口走同一套中间件
+      this.websocketListener_ = new WebSocketListener(this.options_.websocketListener, koa, ForwardRoute.callback(route), [new JsonBufferCodec()], this.options_.websocketListener.labels);
     }
 
     this.registerTraefikListener();
