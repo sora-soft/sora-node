@@ -3,3 +3,7 @@ packages:
   - 'packages/**'
   - 'apps/**'
   - 'docs'
+allowBuilds:
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true

@@ -1,5 +1,12 @@
 # @sora-soft/base-cluster-template
 
+## 1.2.7
+
+### Patch Changes
+
+- Updated dependencies [82b9396]
+  - @sora-soft/http-support@2.3.0
+
 ## 1.2.6
 
 ### Patch Changes
